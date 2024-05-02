@@ -50,12 +50,11 @@ export class REPL {
 	}
 }
 
-// Get command-line arguments
-const args = process.argv.slice(2); // Skip the first two (node and script name)
-
-const repl = new REPL();
 
 (() => {
+	// Get command-line arguments
+	const args = process.argv.slice(2); // Skip the first two (node and script name)
+	const repl = new REPL();
 	if (args.length > 0) {
 		const fileName = args[0];
 
