@@ -1,11 +1,7 @@
 import { BooleanExpression, Identifier, InfixExpression, IntegerLiteral, ReturnStatement, Statement } from "../../src/interfaces/nodes";
 import { Parser } from "../../src/parser";
 
-/**
- * Helper function to check if a parser contains any errors and, if so, fails the test.
- *
- * @param parser - The parser to check.
- */
+
 export function checkParserErrors(parser: Parser) {
 	const errors = parser.errors();
  
@@ -13,37 +9,22 @@ export function checkParserErrors(parser: Parser) {
 	  console.error(`Parser encountered errors: ${errors.join(", ")}`);
 	  throw new Error(`Parser errors found: ${errors.join(", ")}`);
 	}
- }
+}
  
- /**
-  * Helper function to test if a given expression is an identifier with the expected name.
-  *
-  * @param expression - The expression to test.
-  * @param expectedName - The expected identifier name.
-  * @returns True if the expression is an identifier with the expected name; otherwise, false.
-  */
- export function testIdentifier(expression: any, expectedName: string): boolean {
+export function testIdentifier(expression: any, expectedName: string): boolean {
 	if (!(expression instanceof Identifier)) {
-	  console.error(`Expression is not an Identifier. Got: ${typeof expression}`);
-	  return false;
+		console.error(`Expression is not an Identifier. Got: ${typeof expression}`);
+		return false;
 	}
- 
+
 	if (expression.value !== expectedName) {
-	  console.error(`Identifier mismatch. Expected: ${expectedName}, Got: ${expression.value}`);
-	  return false;
+		console.error(`Identifier mismatch. Expected: ${expectedName}, Got: ${expression.value}`);
+		return false;
 	}
- 
+
 	return true;
- }
-/**
- * Helper function to check if an expression is an infix expression with expected left operand, operator, and right operand.
- * 
- * @param expression - The expression to test.
- * @param expectedLeft - The expected left operand (either a string for identifier or a number for integer literal).
- * @param expectedOperator - The expected operator.
- * @param expectedRight - The expected right operand (either a string for identifier or a number for integer literal).
- * @returns True if the infix expression matches the expected structure; otherwise, false.
- */
+}
+
 export function testInfixExpression(
 	expression: any,
 	expectedLeft: string | number,
@@ -98,15 +79,8 @@ export function testInfixExpression(
 	}
  
 	return true;  // If all checks pass, the test is successful
- }
- 
-  /**
- * Test function to check if a given expression is a literal with the expected value.
- *
- * @param expression - The expression to test.
- * @param expectedValue - The expected value for the literal.
- * @returns True if the expression is a literal with the expected value; otherwise, false.
- */
+}
+
 export function testLiteralExpression(expression: any, expectedValue: string | number | boolean): boolean {
 	if (typeof expectedValue === "string") {
 		if (expression instanceof Identifier) {
@@ -148,7 +122,6 @@ export function testLiteralExpression(expression: any, expectedValue: string | n
 	return true;  // If all checks pass, the test is successful
 }
 
- // Helper function to test return statements
 export function testReturnStatement(
 	stmt: Statement,
 	expectedExpression: string
