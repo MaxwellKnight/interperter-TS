@@ -55,12 +55,13 @@ export class ExpressionStatement extends Statement {
 /**
  * The root of the AST, contains a list of statements.
  */
-export class Program {
+export class Program extends Statement{
   statements: Statement[];
 
-  constructor() {
-    this.statements = []; 
-  }
+	constructor() {
+		super(new Token(TokenType.START, TokenType.START));
+		this.statements = []; 
+	}
 
 	public type(): string {
 		return this.statements.length > 0 ? this.statements[0].token.type : ""; 

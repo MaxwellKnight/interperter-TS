@@ -1,4 +1,5 @@
 export enum TokenType {
+	START = "start",
 	INT = "integer",
 	IDENTIFIER = "identifier",
 	ARROW = "arrow",

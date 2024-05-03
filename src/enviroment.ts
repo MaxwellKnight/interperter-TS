@@ -21,14 +21,6 @@ export class Enviroment {
 		return obj;
 	}
 
-	public set_parent(env: Enviroment){
-		this.#parent = env;
-	}
-
-	public get_parent(): Enviroment | null {
-		return this.#parent;
-	}
-
 	static enclosed_env(parent: Enviroment | null){
 		return new Enviroment(parent);
 	}
