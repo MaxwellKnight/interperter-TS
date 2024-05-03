@@ -20,8 +20,4 @@ export class Enviroment {
 		this.#env.set(key, obj);
 		return obj;
 	}
-
-	static enclosed_env(parent: Enviroment | null){
-		return new Enviroment(parent);
-	}
 }
