@@ -237,7 +237,7 @@ export class Evaluator {
 	}
 	
 	private extend_function_env(fn: FunctionObj, args: Obj[]): Enviroment {
-		const env = Enviroment.enclosed_env(fn.env);
+		const env = new Enviroment(fn.env);
 		for(let i = 0; i < fn.parameters!.length; i++){
 			env.set(fn.parameters![i].value, args[i]);
 		}

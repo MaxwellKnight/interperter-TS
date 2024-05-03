@@ -1,8 +1,8 @@
 def adder = f(x){
-	return f(y) {
-		return x + y;
-	};
-};
 
-def addFive = adder(5);
+	return f(y) {
+		return x + y
+	}
+}
+def addFive = adder(5)
 addFive(2)
