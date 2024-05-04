@@ -105,6 +105,21 @@ describe("Evaluator - Arithmetic Infix Operator", () => {
 	});
 });
 
+describe("Evaluator - String concatenation", () => {
+	const tests = [
+		{input: "\"Maxwell\" + \" The\" + \" King\"", expected: "Maxwell The King"},
+		{input: "\"Dor\" + \" \" +  \"Or\" + \" \" + \"Shmenim\"", expected: "Dor Or Shmenim"}
+	]
+
+	tests.forEach((test) => {
+		it(`Should evaluate ${test.input} to ${test.expected}`, () => {
+			const evaluated = testEval(test.input);
+			const result = testStringObject(evaluated, test.expected);
+			expect(result).toBe(true);
+		});
+	});
+});
+
 describe("Evaluator - Boolean Infix Operator", () => {
 	const tests = [
 		{input: "true;", expected: true},
@@ -194,6 +209,7 @@ describe("Evaluator - Test Error Object and Error messages", () => {
 		{input: "-true", expected: "Unknown operator: -boolean"},
 		{input: "true + false;", expected: "Unknown operator: boolean + boolean"}, 
 		{input: "5; true + false; 5", expected: "Unknown operator: boolean + boolean"},
+		{input: "\"Shamen\" / \"Boy\";", expected: "Unknown operator: string / string"},
 		{input: "if (10 > 1) { true + false; }", expected: "Unknown operator: boolean + boolean"},
 		{input: `
 					if (10 > 1) {

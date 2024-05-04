@@ -6,3 +6,4 @@ def adder = f(x){
 }
 def addFive = adder(5)
 addFive(2)
+def name = "Maxwell the King"

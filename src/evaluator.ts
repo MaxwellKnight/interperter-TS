@@ -11,24 +11,13 @@ export class Evaluator {
 	constructor() {};
 
 	/**
-   * - NullObj is always falsy.
-   * - BooleanObj returns its value.
-   * - All other objects are considered truthy.
-   */
-	private is_truthy(obj: Obj): boolean{
-		if(obj instanceof NullObj) return false;
-		else if(obj instanceof BooleanObj) return obj.value;
-		return true;
-	}
-
-	/**
    * Evaluates a given AST node, returning the appropriate object.
    */
 	public eval(node: Node | Program | null, env: Enviroment): Obj {
 		if(node instanceof IntegerLiteral){
 			return new IntegerObj(node.value);
 		}
-		if(node instanceof StringLiteral){
+		else if(node instanceof StringLiteral){
 			return new StringObj(node.value);
 		}
 		else if(node instanceof BooleanExpression){
@@ -162,6 +151,9 @@ export class Evaluator {
 		if((left instanceof IntegerObj) && (right instanceof IntegerObj))
 			return this.eval_integer_infix_expression(operator, left, right);
 
+		else if((left instanceof StringObj) && (right instanceof StringObj))
+			return this.eval_string_infix_expression(operator, left, right);
+		
 		else if(operator == "==")
 			return left.value == right.value ? TRUE : FALSE;
 		
@@ -183,6 +175,12 @@ export class Evaluator {
 			case ">": 	return left.value > right.value ? TRUE : FALSE;
 			case "==":	return left.value === right.value ? TRUE : FALSE;
 			case "!=":	return left.value !== right.value ? TRUE : FALSE;
+			default:	 	return ErrorObj.create("Unknown operator:", [left.type, operator, right.type]);
+		}
+	}
+	private eval_string_infix_expression(operator: string, left: StringObj, right: StringObj): Obj  {
+		switch(operator){
+			case "+":	return new StringObj(left.value + right.value);
 			default:	 	return ErrorObj.create("Unknown operator:", [left.type, operator, right.type]);
 		}
 	}
@@ -239,5 +237,16 @@ export class Evaluator {
 			return obj.value;
 
 		return obj;
+	}
+
+	/**
+   * - NullObj is always falsy.
+   * - BooleanObj returns its value.
+   * - All other objects are considered truthy.
+   */
+	private is_truthy(obj: Obj): boolean{
+		if(obj instanceof NullObj) return false;
+		else if(obj instanceof BooleanObj) return obj.value;
+		return true;
 	}
  }
