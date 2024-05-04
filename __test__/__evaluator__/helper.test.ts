@@ -1,6 +1,6 @@
 import { Enviroment } from "../../src/enviroment";
 import { Evaluator } from "../../src/evaluator";
-import { BooleanObj, ErrorObj, IntegerObj, NullObj, Obj } from "../../src/interfaces/object";
+import { BooleanObj, ErrorObj, IntegerObj, NullObj, Obj, StringObj } from "../../src/interfaces/object";
 import { Parser } from "../../src/parser";
 import { checkParserErrors } from "../__parser__/helper.test";
 
@@ -18,8 +18,7 @@ export function testIntegerObject(obj: Obj | null, expected: number): boolean {
 
 	return true; 
 }
-
-// Function to test if an object is an NullObj 
+ 
 export function testNullObject(obj: Obj | null): boolean {
 	if (!(obj instanceof NullObj)) { 
 		console.error(`Object is not NullObj. Got: ${typeof obj}`);
@@ -29,7 +28,6 @@ export function testNullObject(obj: Obj | null): boolean {
 	return true; 
 }
 
-// Function to test if an object is an BooleanObj with the expected value
 export function testBooleanObject(obj: Obj | null, expected: boolean): boolean {
 	if (!(obj instanceof BooleanObj)) { 
 		console.error(`Object is not BooleanObj. Got: ${typeof obj}`);
@@ -38,6 +36,19 @@ export function testBooleanObject(obj: Obj | null, expected: boolean): boolean {
 
 	if (obj.value !== expected) { 
 		console.error(`BooleanObj has wrong value. Got: ${obj.value}, expected: ${expected}`);
+		return false;
+	}
+	return true; 
+}
+
+export function testStringObject(obj: Obj | null, expected: string): boolean {
+	if (!(obj instanceof StringObj)) { 
+		console.error(`Object is not StringObj. Got: ${typeof obj}`);
+		return false;
+	}
+
+	if (obj.value !== expected) { 
+		console.error(`StringObj has wrong value. Got: ${obj.value}, expected: ${expected}`);
 		return false;
 	}
 	return true; 

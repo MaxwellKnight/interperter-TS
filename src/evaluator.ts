@@ -1,6 +1,6 @@
 import { Enviroment } from "./enviroment";
-import { BlockStatement, BooleanExpression, CallExpression, DefineStatement, Expression, ExpressionStatement, FunctionLiteral, Identifier, IfExpression, InfixExpression, IntegerLiteral, Node, PrefixExpression, Program, ReturnStatement, Statement } from "./interfaces/nodes";
-import { BooleanObj, ErrorObj, FunctionObj, IntegerObj, NullObj, Obj, ObjectType, ReturnObj } from "./interfaces/object";
+import { BlockStatement, BooleanExpression, CallExpression, DefineStatement, Expression, ExpressionStatement, FunctionLiteral, Identifier, IfExpression, InfixExpression, IntegerLiteral, Node, PrefixExpression, Program, ReturnStatement, Statement, StringLiteral } from "./interfaces/nodes";
+import { BooleanObj, ErrorObj, FunctionObj, IntegerObj, NullObj, Obj, ObjectType, ReturnObj, StringObj } from "./interfaces/object";
 
 
 const TRUE = new BooleanObj(true);
@@ -11,7 +11,6 @@ export class Evaluator {
 	constructor() {};
 
 	/**
-   * Checks if a given object is truthy, with specific rules for different object types.
    * - NullObj is always falsy.
    * - BooleanObj returns its value.
    * - All other objects are considered truthy.
@@ -24,11 +23,13 @@ export class Evaluator {
 
 	/**
    * Evaluates a given AST node, returning the appropriate object.
-   * Supports multiple node types, including literals, expressions, statements, etc.
    */
 	public eval(node: Node | Program | null, env: Enviroment): Obj {
 		if(node instanceof IntegerLiteral){
 			return new IntegerObj(node.value);
+		}
+		if(node instanceof StringLiteral){
+			return new StringObj(node.value);
 		}
 		else if(node instanceof BooleanExpression){
 			return node.value ? TRUE : FALSE;
@@ -98,7 +99,6 @@ export class Evaluator {
 
 	/**
    * Evaluates a program consisting of multiple statements.
-   * Returns the result of the last evaluated statement.
    */
 	private eval_program(statements: Statement[], env: Enviroment): Obj {
 		let result = new NullObj();
@@ -114,10 +114,6 @@ export class Evaluator {
 		return result;
 	}
 
-	/**
-   * Evaluates a block of statements, typically used in functions, if statements, etc.
-   * Returns the result of the last evaluated statement, or a return or error if encountered.
-   */
 	private eval_block_statement(node: BlockStatement, env: Enviroment): Obj  {
 		let result = new NullObj();
 
@@ -129,10 +125,6 @@ export class Evaluator {
 		return result;
 	}
 
-	/**
-   * Evaluates a prefix expression with the given operator and operand.
-   * Supports common operators like '!' (bang) and '-' (minus).
-   */
 	private eval_prefix_expression(operator: string, operand: Obj): Obj {
 		switch(operator){
 			case "!": 	return this.eval_bang_prefix(operand);
@@ -162,7 +154,6 @@ export class Evaluator {
 
 	/**
    * Evaluates an expression with a given operator and two operands (infix).
-   * Supports various operators like arithmetic and comparison operators.
    */
 	private eval_infix_expression(operator: string, left: Obj, right: Obj): Obj {
 		if(left.type !== right.type) 

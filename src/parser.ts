@@ -14,7 +14,8 @@ import {
 	PrefixExpression, 
 	Program, 
 	ReturnStatement, 
-	Statement 
+	Statement, 
+	StringLiteral
 } from "./interfaces/nodes";
 import { Token, TokenType } from "./interfaces/token";
 import { Lexer } from "./lexer";
@@ -30,19 +31,7 @@ enum Precedence {
 	CALL
 };
 
-/**
- * def foo = 10;
- * 
- * def x = 5 + foo;
- * 
- * def add = f(x, y) {
- * 	return x + y;
- * }
- * 
- * def add = f(x, y) => x + y;
- * 
- * 
- */
+
 const PRECEDENCES = new Map<TokenType, Precedence>();
 PRECEDENCES.set(TokenType.EQUALS, Precedence.EQAULS);
 PRECEDENCES.set(TokenType.NOT_EQUALS, Precedence.EQAULS);
@@ -81,6 +70,7 @@ export class Parser {
 		this.#infix_fns = new Map<TokenType, InfixFn>();
 		this.register_prefix(TokenType.IDENTIFIER, this.parse_identifier);
 		this.register_prefix(TokenType.INT, this.parse_integer);
+		this.register_prefix(TokenType.STRING, this.parse_string);
 		this.register_prefix(TokenType.BANG, this.parse_prefix_expression);
 		this.register_prefix(TokenType.MINUS, this.parse_prefix_expression);
 
@@ -244,6 +234,11 @@ export class Parser {
 
 	private parse_identifier(): Expression | null { return new Identifier(this.#current); }
 	private parse_boolean(): Expression | null { return new BooleanExpression(this.#current, this.compare_current(TokenType.TRUE)); }
+	private parse_string(): Expression | null { 
+		const str = new  StringLiteral(this.#current);
+		str.value = this.#current.literal;
+		return str; 
+	}
 
 	private parse_integer(): Expression | null {
 		const integer = new IntegerLiteral(this.#current);

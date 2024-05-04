@@ -3,6 +3,7 @@ import { BlockStatement, Identifier } from "./nodes";
 
 export enum ObjectType {
 	INTEGER_OBJ = "integer",
+	STRING_OBJ = "string",
 	BOOLEAN_OBJ = "boolean",
 	RETURN_OBJ = "return",
 	FUNCTION_OBJ = "function",
@@ -27,6 +28,16 @@ export class IntegerObj extends Obj {
 	value: number;
 	constructor(value: number){
 		super(ObjectType.INTEGER_OBJ);
+		this.value = value;
+	}
+	
+	public stringify(): string { return `${this.value}`; }
+}
+
+export class StringObj extends Obj {
+	value: string;
+	constructor(value: string){
+		super(ObjectType.STRING_OBJ);
 		this.value = value;
 	}
 	

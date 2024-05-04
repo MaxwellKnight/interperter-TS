@@ -7,33 +7,33 @@ import { Token, TokenType } from "./token";
 export abstract class Node {
   token: Token;
 
-  constructor(token: Token) {
-    this.token = token; // The token that represents this node
-  }
+	constructor(token: Token) {
+		this.token = token; // The token that represents this node
+	}
 
-  /**
-   * Returns a string representation of the node.
-   * Abstract, must be implemented in subclasses.
-   */
-  public abstract stringify(): string;
+	/**
+	* Returns a string representation of the node.
+	* Abstract, must be implemented in subclasses.
+	*/
+	public abstract stringify(): string;
 }
 
 /**
  * Base class for all statement nodes in the AST.
  */
 export abstract class Statement extends Node {
-  constructor(token: Token) {
-    super(token); 
-  }
+	constructor(token: Token) {
+		super(token); 
+	}
 }
 
 /**
  * Base class for all expression nodes in the AST.
  */
 export abstract class Expression extends Node {
-  constructor(token: Token) {
-    super(token); 
-  }
+	constructor(token: Token) {
+		super(token); 
+	}
 }
 
 /**
@@ -42,14 +42,12 @@ export abstract class Expression extends Node {
 export class ExpressionStatement extends Statement {
   expression: Expression | null;
 
-  constructor(token: Token) {
-    super(token); 
-    this.expression = null;
-  }
+	constructor(token: Token) {
+		super(token); 
+		this.expression = null;
+	}
 
-  public stringify(): string {
-    return this.expression ? this.expression.stringify() : "";
-  }
+	public stringify(): string { return this.expression ? this.expression.stringify() : ""; }
 }
 
 /**
@@ -78,14 +76,14 @@ export class Program extends Statement{
 export class Identifier extends Expression {
   value: string;
 
-  constructor(token: Token) {
-    super(token); 
-    this.value = token.literal; 
-  }
+	constructor(token: Token) {
+		super(token); 
+		this.value = token.literal; 
+	}
 
-  public stringify(): string {
-    return this.value; 
-  }
+	public stringify(): string {
+		return this.value; 
+	}
 }
 
 /**
@@ -95,55 +93,62 @@ export class DefineStatement extends Statement {
   name: Identifier;
   value: Expression | null;
 
-  constructor(token: Token) {
-	  super(token); 
-	  this.name = new Identifier(token);
-    this.value = null; 
-  }
+	constructor(token: Token) {
+		super(token); 
+		this.name = new Identifier(token);
+		this.value = null; 
+	}
 
-  public stringify(): string {
-    let template = `${this.token.literal} ${this.name.stringify()}`; 
-    return this.value ? `${template} = ${this.value.stringify()}` : template;
-  }
+	public stringify(): string {
+		let template = `${this.token.literal} ${this.name.stringify()}`; 
+		return this.value ? `${template} = ${this.value.stringify()}` : template;
+	}
 }
 
 export class ReturnStatement extends Statement {
   value: Expression | null;
 
-  constructor(token: Token) {
-    super(token); 
-    this.value = null; 
-  }
+	constructor(token: Token) {
+		super(token); 
+		this.value = null; 
+	}
 
-  public stringify(): string {
-    return this.value ? `${this.token.literal} ${this.value.stringify()}` : ""; 
-  }
+	public stringify(): string {
+		return this.value ? `${this.token.literal} ${this.value.stringify()}` : ""; 
+	}
 }
 
 export class IntegerLiteral extends Expression {
   value: number;
 
-  constructor(token: Token) {
-    super(token);
-    this.value = Number(token.literal); 
-  }
+	constructor(token: Token) {
+		super(token);
+		this.value = Number(token.literal); 
+	}
 
-  public stringify(): string {
-    return this.token.literal; 
-  }
+	public stringify(): string { return this.token.literal; }
+}
+
+export class StringLiteral extends Expression {
+  value: string;
+
+	constructor(token: Token) {
+		super(token);
+		this.value = token.literal; 
+	}
+
+	public stringify(): string { return this.token.literal; }
 }
 
 export class BooleanExpression extends Expression {
   value: boolean;
 
-  constructor(token: Token, value: boolean) {
-    super(token);
-    this.value = value;
-  }
+	constructor(token: Token, value: boolean) {
+		super(token);
+		this.value = value;
+	}
 
-  public stringify(): string {
-    return this.token.literal; 
-  }
+	public stringify(): string { return this.token.literal; }
 }
 
 /**

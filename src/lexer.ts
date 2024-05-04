@@ -73,6 +73,7 @@ export class Lexer {
 			case "<":	token = new Token(TokenType.LT, this.#character);			break;
 			case ";": 	token = new Token(TokenType.SEMICOLON, this.#character);	break;
 			case "\0":	token = new Token(TokenType.EOF, this.#character);			break;
+			case "\"":	token = new Token(TokenType.STRING, this.read_string());	break;
 			case "!":	
 				if(this.peek() == '=') 	{
 					let char = this.#character;
@@ -123,6 +124,32 @@ export class Lexer {
 
 		return this.#source.slice(pos, this.#cursor);
 	}
+
+	private read_string(): string {
+		let result = ""; 
+		let escaped = false; 
+		
+		while (!this.isEOF()) {
+			this.read_char(); 
+
+			if (escaped) {
+				switch (this.#character) {
+					case 'n': 	result += '\n';	break;
+					case 't':	result += '\t';	break;
+					case '\"':  result += '\"';	break;
+					case '\\': 	result += '\\'; 	break;
+					default:  	result += this.#character;
+				}
+				escaped = false; // Reset escape flag
+			} else {
+				if (this.#character === '\\')  escaped = true; // The next character is an escape sequence
+				if (this.#character === '\"')  break;
+				result += this.#character; // Normal character, add to result
+			}
+		}
+  
+		return result;
+  	}
 	
 	private lookup_identifier(ident: string): TokenType {
 		if(ident in KEYWORDS) return KEYWORDS[ident];

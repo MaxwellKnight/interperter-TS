@@ -1,6 +1,6 @@
 // tests/expression.test.ts
 import { Parser } from "../../src/parser";
-import { ExpressionStatement, Identifier, IntegerLiteral, PrefixExpression, InfixExpression, Expression } from "../../src/interfaces/nodes";
+import { ExpressionStatement, Identifier, IntegerLiteral, PrefixExpression, InfixExpression, Expression, StringLiteral } from "../../src/interfaces/nodes";
 
 describe("Parser - Identifier Expression", () => {
 	it("should parse a simple identifier expression", () => {
@@ -31,6 +31,22 @@ describe("Parser - Integer Literal Expression", () => {
 		const integerLiteral = expressionStatement.expression as IntegerLiteral;
 
 		expect(integerLiteral.value).toBe(25);
+	});
+});
+
+describe("Parser - String Literal Expression", () => {
+	it("should parse a simple string literal expression", () => {
+		const source = `"shamenboy the man";\n`;
+		const parser = new Parser(source);
+
+		const program = parser.parse_program();
+
+		expect(program.statements.length).toBe(1);
+
+		const expressionStatement = program.statements[0] as ExpressionStatement;
+		const stringLiteral = expressionStatement.expression as StringLiteral;
+
+		expect(stringLiteral.value).toBe("shamenboy the man");
 	});
 });
 

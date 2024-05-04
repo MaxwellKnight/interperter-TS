@@ -1,9 +1,9 @@
 import { BlockStatement, InfixExpression } from "../../src/interfaces/nodes";
 import { FunctionObj, ObjectType } from "../../src/interfaces/object";
 import { testInfixExpression } from "../__parser__/helper.test";
-import { testIntegerObject, testBooleanObject, testEval, testNullObject, testErrorObj } from "./helper.test";
+import { testIntegerObject, testBooleanObject, testEval, testNullObject, testErrorObj, testStringObject } from "./helper.test";
 
-describe("Evaluator - Integer and boolean Expression Evaluation", () => {
+describe("Evaluator - Integer, Boolean and String Expression Evaluation", () => {
 	// Define the test cases
 	const testsIntegers = [
 		{ input: "5;", expected: 5 },
@@ -13,19 +13,30 @@ describe("Evaluator - Integer and boolean Expression Evaluation", () => {
 		{ input: "true;", expected: true },
 		{ input: "false;", expected: false },
 	];
+	const testStrings = [
+		{ input: "\"true;\";", expected: "true;" },
+		{ input: "\"pj script\n\t\";", expected: "pj script\n\t" },
+	];
 
-	// Test each case
+
 	testsIntegers.forEach((test) => {
 		it(`should evaluate integer expression '${test.input}' correctly`, () => {
-		const evaluated = testEval(test.input);  // Evaluate the expression
-		expect(testIntegerObject(evaluated, test.expected)).toBe(true);  // Test the result
+		const evaluated = testEval(test.input);  
+		expect(testIntegerObject(evaluated, test.expected)).toBe(true); 
 		});
 	});
-	// Test each case
+
 	testsBooleans.forEach((test) => {
 		it(`should evaluate boolean expression '${test.input}' correctly`, () => {
-		const evaluated = testEval(test.input);  // Evaluate the expression
-		expect(testBooleanObject(evaluated, test.expected)).toBe(true);  // Test the result
+		const evaluated = testEval(test.input);  
+		expect(testBooleanObject(evaluated, test.expected)).toBe(true); 
+		});
+	});
+
+	testStrings.forEach((test) => {
+		it(`should evaluate string expression '${test.input}' correctly`, () => {
+		const evaluated = testEval(test.input);  
+		expect(testStringObject(evaluated, test.expected)).toBe(true); 
 		});
 	});
 });
@@ -42,9 +53,9 @@ describe("Evaluator - Bang Operator", () => {
 
 	tests.forEach((test) => {
 		it(`should evaluate '${test.input}' to ${test.expected}`, () => {
-			const evaluated = testEval(test.input);  // Evaluate the expression
-			const result = testBooleanObject(evaluated, test.expected);  // Check the boolean object
-			expect(result).toBe(true);  // Assert that the test passed
+			const evaluated = testEval(test.input);  
+			const result = testBooleanObject(evaluated, test.expected);  
+			expect(result).toBe(true);  
 		});
 	});
  });
@@ -59,9 +70,9 @@ describe("Evaluator - Minus Operator", () => {
  
 	tests.forEach((test) => {
 		it(`should evaluate '${test.input}' to ${test.expected}`, () => {
-			const evaluated = testEval(test.input);  // Evaluate the expression
-			const result = testIntegerObject(evaluated, test.expected);  // Check the boolean object
-			expect(result).toBe(true);  // Assert that the test passed
+			const evaluated = testEval(test.input);  
+			const result = testIntegerObject(evaluated, test.expected);  
+			expect(result).toBe(true);  
 		});
 	});
 });
@@ -87,9 +98,9 @@ describe("Evaluator - Arithmetic Infix Operator", () => {
  
 	tests.forEach((test) => {
 		it(`should evaluate '${test.input}' to ${test.expected}`, () => {
-			const evaluated = testEval(test.input);  // Evaluate the expression
+			const evaluated = testEval(test.input);  
 			const result = testIntegerObject(evaluated, test.expected); 
-			expect(result).toBe(true);  // Assert that the test passed
+			expect(result).toBe(true);  
 		});
 	});
 });
@@ -119,9 +130,9 @@ describe("Evaluator - Boolean Infix Operator", () => {
 
 	tests.forEach((test) => {
 		it(`should evaluate '${test.input}' to ${test.expected}`, () => {
-			const evaluated = testEval(test.input);  // Evaluate the expression
+			const evaluated = testEval(test.input);  
 			const result = testBooleanObject(evaluated, test.expected); 
-			expect(result).toBe(true);  // Assert that the test passed
+			expect(result).toBe(true);  
 		});
 	});
 });
@@ -139,13 +150,13 @@ describe("Evaluator - If Else Expressions", () => {
  
 	tests.forEach((test) => {
 		it(`should evaluate '${test.input}' to ${test.expected}`, () => {
-			const evaluated = testEval(test.input);  // Evaluate the expression
+			const evaluated = testEval(test.input);  
 			let result: boolean;
 			if(test.expected === null)
 				result = testNullObject(evaluated);
 			else result = testIntegerObject(evaluated, test.expected); 
 
-			expect(result).toBe(true);  // Assert that the test passed
+			expect(result).toBe(true);  
 		});
 	});
 });
@@ -168,9 +179,9 @@ describe("Evaluator - Return Statements", () => {
  
 	tests.forEach((test) => {
 		it(`should evaluate '${test.input}' to ${test.expected}`, () => {
-			const evaluated = testEval(test.input);  // Evaluate the expression
+			const evaluated = testEval(test.input);  
 			const result = testIntegerObject(evaluated, test.expected); 
-			expect(result).toBe(true);  // Assert that the test passed
+			expect(result).toBe(true);  
 		});
 	});
 });
@@ -196,9 +207,9 @@ describe("Evaluator - Test Error Object and Error messages", () => {
  
 	tests.forEach((test) => {
 		it(`should evaluate '${test.input}' to ${test.expected}`, () => {
-			const evaluated = testEval(test.input);  // Evaluate the expression
+			const evaluated = testEval(test.input);  
 			const result = testErrorObj(evaluated, test.expected); 
-			expect(result).toBe(true);  // Assert that the test passed
+			expect(result).toBe(true);  
 		});
 	});
 });
@@ -213,9 +224,9 @@ describe("Evaluator - Test Def statements", () => {
  
 	tests.forEach((test) => {
 		it(`should evaluate '${test.input}' to ${test.expected}`, () => {
-			const evaluated = testEval(test.input);  // Evaluate the expression
+			const evaluated = testEval(test.input);  
 			const result = testIntegerObject(evaluated, test.expected); 
-			expect(result).toBe(true);  // Assert that the test passed
+			expect(result).toBe(true);  
 		});
 	});
 });
@@ -256,9 +267,9 @@ describe("Evaluator - Test Call Expressions", () => {
  
 	tests.forEach((test) => {
 		it(`should evaluate '${test.input}' to ${test.expected}`, () => {
-			const evaluated = testEval(test.input);  // Evaluate the expression
+			const evaluated = testEval(test.input);  
 			const result = testIntegerObject(evaluated, test.expected); 
-			expect(result).toBe(true);  // Assert that the test passed
+			expect(result).toBe(true);  
 		});
 	});
 });
@@ -275,9 +286,9 @@ describe("Evaluator - Test Closure", () => {
  
 	tests.forEach((test) => {
 		it(`should evaluate '${test.input}' to ${test.expected}`, () => {
-			const evaluated = testEval(test.input);  // Evaluate the expression
+			const evaluated = testEval(test.input);  
 			const result = testIntegerObject(evaluated, test.expected); 
-			expect(result).toBe(true);  // Assert that the test passed
+			expect(result).toBe(true);  
 		});
 	});
 });

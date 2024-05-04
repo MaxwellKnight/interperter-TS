@@ -103,6 +103,9 @@ describe('Lexer', () => {
 		}
 		10 == 10
 		10 != 9
+		"shamen"
+		"uglyfaceman"
+		"		\n		"
 		`)
 
 		const expectedTokens = [
@@ -187,6 +190,10 @@ describe('Lexer', () => {
 			new Token(TokenType.INT, '10'),
 			new Token(TokenType.NOT_EQUALS, '!='),
 			new Token(TokenType.INT, '9'),
+
+			new Token(TokenType.STRING, 'shamen'),
+			new Token(TokenType.STRING, 'uglyfaceman'),
+			new Token(TokenType.STRING, '		\n		'),
 	  
 			new Token(TokenType.EOF, '\0'), // End of file
 	  ];
