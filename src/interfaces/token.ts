@@ -4,10 +4,12 @@ export enum TokenType {
 	STRING = "string",
 	IDENTIFIER = "identifier",
 	ARROW = "arrow",
-	RPAREN = "lparen",
-	LPAREN = "rparen",
-	RBRACE = "lbrace",
-	LBRACE = "rbrace",
+	RPAREN = "rparen",
+	LPAREN = "lparen",
+	RBRACE = "rbrace",
+	LBRACE = "lbrace",
+	LBRACKET = "lbracket",
+	RBRACKET = "rbracket",
 	ASSIGN = "assign",
 	COMMA = "comma",
 	PLUS = "plus",
@@ -32,7 +34,7 @@ export enum TokenType {
 	IF = "if",
 	ELSE = "else",
 	RETURN = "return",
-	BANG = "bang" // ! symbol
+	BANG = "bang" // `!` symbol
 }
 
 export interface Token {

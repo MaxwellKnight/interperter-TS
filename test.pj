@@ -1,9 +1,13 @@
-def adder = f(x){
-
-	return f(y) {
-		return x + y
-	}
+def adder = f(x) {
+	return f(y) =>  x + y;
 }
+
+def fib = f(n) => if (n <= 2) return 1 else return fib(n - 1) + fib(n - 2);
+
 def addFive = adder(5)
-addFive(2)
-def name = "Maxwell the King"
+
+def name = "Maxwell the King" + " " + "!!";
+len(name);
+addFive(2);
+
+fib(8);

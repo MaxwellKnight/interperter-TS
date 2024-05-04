@@ -1,6 +1,6 @@
 import { Enviroment } from "./enviroment";
-import { BlockStatement, BooleanExpression, CallExpression, DefineStatement, Expression, ExpressionStatement, FunctionLiteral, Identifier, IfExpression, InfixExpression, IntegerLiteral, Node, PrefixExpression, Program, ReturnStatement, Statement, StringLiteral } from "./interfaces/nodes";
-import { BooleanObj, ErrorObj, FunctionObj, IntegerObj, NullObj, Obj, ObjectType, ReturnObj, StringObj } from "./interfaces/object";
+import { ArrowFunctionLiteral, BlockStatement, BooleanExpression, CallExpression, DefineStatement, Expression, ExpressionStatement, FunctionLiteral, Identifier, IfExpression, InfixExpression, IntegerLiteral, Node, PrefixExpression, Program, ReturnStatement, Statement, StringLiteral } from "./interfaces/nodes";
+import { BooleanObj, BuiltinObj, ErrorObj, FunctionObj, IntegerObj, NullObj, Obj, ObjectType, ReturnObj, StringObj } from "./interfaces/object";
 
 
 const TRUE = new BooleanObj(true);
@@ -8,7 +8,22 @@ const FALSE = new BooleanObj(false);
 const NULL = new NullObj();
 
 export class Evaluator {
-	constructor() {};
+	builtins: Map<string, BuiltinObj>;
+
+	constructor() {
+		this.builtins = new Map<string, BuiltinObj>;
+		this.builtins.set("len", new BuiltinObj((...args: Obj[]): Obj => {
+			if(args.length != 1){
+				return ErrorObj.create("Invalid argument count `len` takes 1, got:", [String(args.length)]);
+			}
+			switch(args[0].type){
+				case ObjectType.STRING_OBJ:
+					return new IntegerObj(args[0].value.toString().length);
+				default: 
+					return ErrorObj.create("Unsupported argument to `len`, got:", [args[0].type])
+			}
+		}))
+	};
 
 	/**
    * Evaluates a given AST node, returning the appropriate object.
@@ -66,7 +81,7 @@ export class Evaluator {
 			env.set(node.name.value, value);
 			return value;
 		}
-		else if(node instanceof FunctionLiteral){
+		else if(node instanceof FunctionLiteral || node instanceof ArrowFunctionLiteral){
 			const fn = new FunctionObj();
 			fn.body = node.body;
 			fn.parameters = node.parameters;
@@ -153,7 +168,7 @@ export class Evaluator {
 
 		else if((left instanceof StringObj) && (right instanceof StringObj))
 			return this.eval_string_infix_expression(operator, left, right);
-		
+
 		else if(operator == "==")
 			return left.value == right.value ? TRUE : FALSE;
 		
@@ -172,7 +187,9 @@ export class Evaluator {
 			case "%": 	return new IntegerObj(left.value % right.value);
 			case "**": 	return new IntegerObj(Math.pow(left.value, right.value));
 			case "<": 	return left.value < right.value ? TRUE : FALSE;
+			case "<=": 	return left.value <= right.value ? TRUE : FALSE;
 			case ">": 	return left.value > right.value ? TRUE : FALSE;
+			case ">=": 	return left.value >= right.value ? TRUE : FALSE;
 			case "==":	return left.value === right.value ? TRUE : FALSE;
 			case "!=":	return left.value !== right.value ? TRUE : FALSE;
 			default:	 	return ErrorObj.create("Unknown operator:", [left.type, operator, right.type]);
@@ -200,9 +217,12 @@ export class Evaluator {
 
 	private eval_identifier(node: Identifier, env: Enviroment): Obj{
 		const obj =  env.get(node.value);
-		if(!obj) return ErrorObj.create("Unknown identifier:", [node.value]);
+		if(obj) return obj
 
-		return obj;
+		const builtin = this.builtins.get(node.value);
+		if(builtin) return builtin;
+
+		return ErrorObj.create("Unknown identifier:", [node.value]);
 	}
 
 	private eval_expressions(expressions: Expression[], env: Enviroment): Obj[]{
@@ -217,12 +237,15 @@ export class Evaluator {
 	}
 
 	private apply_function(fn: Obj, args: Obj[]): Obj{
-		if(!(fn instanceof FunctionObj)){
-			return ErrorObj.create("not a function:", [fn.type]);
+		if(fn instanceof FunctionObj){
+			const extendedEnv = this.extend_function_env(fn, args);
+			const result = this.eval(fn.body, extendedEnv);
+			return this.unwrap_return(result);
 		}
-		const extendedEnv = this.extend_function_env(fn, args);
-		const result = this.eval(fn.body, extendedEnv);
-		return this.unwrap_return(result);
+		else if(fn instanceof BuiltinObj){
+			return fn.fn(...args);
+		}
+		return ErrorObj.create("not a function:", [fn.type]);
 	}
 	
 	private extend_function_env(fn: FunctionObj, args: Obj[]): Enviroment {

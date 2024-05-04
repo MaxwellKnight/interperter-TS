@@ -1,5 +1,5 @@
 import { Enviroment } from "../enviroment";
-import { BlockStatement, Identifier } from "./nodes";
+import { BlockStatement, Expression, ExpressionStatement, Identifier } from "./nodes";
 
 export enum ObjectType {
 	INTEGER_OBJ = "integer",
@@ -7,10 +7,13 @@ export enum ObjectType {
 	BOOLEAN_OBJ = "boolean",
 	RETURN_OBJ = "return",
 	FUNCTION_OBJ = "function",
+	BUILTIN_OBJ = "builtin",
 	ERROR_OBJ = "error",
 	NULL_OBJ = "null"
 }
 export type ObjectValue = number | string | boolean | Obj
+export type BuiltinFunction = (...args: Obj[]) => Obj
+
 // Base class for all objects in the interpreter
 export abstract class Obj {
 	type: ObjectType; // Type of the object
@@ -64,6 +67,42 @@ export class ReturnObj extends Obj {
 	public stringify(): string { return this.value.stringify(); }
 }
 
+export class NullObj extends Obj {
+	constructor(){
+		super(ObjectType.NULL_OBJ);
+	}
+	
+	public stringify(): string { return "null"; }
+}
+
+export class FunctionObj extends Obj {
+	parameters: Identifier[] | null;
+	body: BlockStatement | Expression | null;
+	env: Enviroment | null;
+
+	constructor(){
+		super(ObjectType.FUNCTION_OBJ);
+		this.parameters = [];
+		this.body = null;
+		this.env = null;
+	}
+
+	public stringify(): string {
+		return `f(${this.parameters?.map((param) => param.stringify())} {\n ${this.body?.stringify()} \n})`
+	}
+}
+
+export class BuiltinObj extends Obj {
+	fn: BuiltinFunction;
+
+	constructor(fn: BuiltinFunction){
+		super(ObjectType.BUILTIN_OBJ);
+		this.fn = fn;
+	}
+
+	public stringify(): string { return "builtin function"; }
+}
+
 export class ErrorObj extends Obj {
 	value: string;
 
@@ -81,29 +120,4 @@ export class ErrorObj extends Obj {
 	}
 
 	public stringify(): string { return `ERROR: ${this.value}`; }
-}
-
-export class NullObj extends Obj {
-	constructor(){
-		super(ObjectType.NULL_OBJ);
-	}
-	
-	public stringify(): string { return "null"; }
-}
-
-export class FunctionObj extends Obj {
-	parameters: Identifier[] | null;
-	body: BlockStatement | null;
-	env: Enviroment | null;
-
-	constructor(){
-		super(ObjectType.FUNCTION_OBJ);
-		this.parameters = [];
-		this.body = null;
-		this.env = null;
-	}
-
-	public stringify(): string {
-		return `f(${this.parameters?.map((param) => param.stringify())} {\n ${this.body?.stringify()} \n})`
-	}
 }

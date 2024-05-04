@@ -206,8 +206,8 @@ export class BlockStatement extends Statement {
  */
 export class IfExpression extends Expression {
 	condition: Expression | null;
-	if_case: BlockStatement | null;
-	else_case: BlockStatement | null;
+	if_case: BlockStatement | Statement | null;
+	else_case: BlockStatement | Statement | null;
 
 	constructor(token: Token){
 		super(token);

@@ -106,6 +106,7 @@ describe('Lexer', () => {
 		"shamen"
 		"uglyfaceman"
 		"		\n		"
+		[foo, 6]
 		`)
 
 		const expectedTokens = [
@@ -194,6 +195,11 @@ describe('Lexer', () => {
 			new Token(TokenType.STRING, 'shamen'),
 			new Token(TokenType.STRING, 'uglyfaceman'),
 			new Token(TokenType.STRING, '		\n		'),
+			new Token(TokenType.LBRACKET, '['),
+			new Token(TokenType.IDENTIFIER, 'foo'),
+			new Token(TokenType.COMMA, ','),
+			new Token(TokenType.INT, '6'),
+			new Token(TokenType.RBRACKET, ']'),
 	  
 			new Token(TokenType.EOF, '\0'), // End of file
 	  ];

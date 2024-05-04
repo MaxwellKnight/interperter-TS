@@ -285,14 +285,25 @@ export class Parser {
 		expr.condition = this.parse_expression(Precedence.LOWEST);
 
 		if(!this.expect(TokenType.RPAREN)) return null;
-		if(!this.expect(TokenType.LBRACE)) return null;
 
-		expr.if_case = this.parse_block_statement();
+		if(this.compare_peek(TokenType.LBRACE)){
+			this.advance();
+			expr.if_case = this.parse_block_statement();
+		}else {
+			this.advance();
+			expr.if_case = this.parse_statement();
+		}
 
 		if(this.compare_peek(TokenType.ELSE)){
 			this.advance();
-			if(!this.expect(TokenType.LBRACE)) return null;
-			expr.else_case = this.parse_block_statement();
+
+			if(this.compare_peek(TokenType.LBRACE)){
+				this.advance();
+				expr.else_case = this.parse_block_statement();
+			}else {
+				this.advance();
+				expr.else_case = this.parse_statement();
+			}
 		}
 
 		return expr;

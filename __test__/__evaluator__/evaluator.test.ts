@@ -1,4 +1,4 @@
-import { BlockStatement, InfixExpression } from "../../src/interfaces/nodes";
+import { BlockStatement, Expression, ExpressionStatement, InfixExpression } from "../../src/interfaces/nodes";
 import { FunctionObj, ObjectType } from "../../src/interfaces/object";
 import { testInfixExpression } from "../__parser__/helper.test";
 import { testIntegerObject, testBooleanObject, testEval, testNullObject, testErrorObj, testStringObject } from "./helper.test";
@@ -249,25 +249,33 @@ describe("Evaluator - Test Def statements", () => {
 
 describe("Function Object Tests", () => {
 	it("should evaluate and validate a function object", () => {
-		const input = "f(x) { x + 2; };";  // Function declaration
+		const input = "f(x) { x + 2; }";  // Function declaration
+		const arrowfunction =  "f(x) => x ** 2;";  // Function declaration
 		const evaluated = testEval(input);  // Evaluate the function
+		const evaluatedArrow = testEval(arrowfunction);  // Evaluate the function
 
 		// Ensure the evaluated object is a FunctionObj
 		expect(evaluated?.type).toBe(ObjectType.FUNCTION_OBJ);
+		expect(evaluatedArrow?.type).toBe(ObjectType.FUNCTION_OBJ);
 
 		const fn = evaluated as FunctionObj;
+		const arrowfn = evaluatedArrow as FunctionObj;
 
 		// Check if the function has exactly one parameter
 		expect(fn.parameters?.length).toBe(1);
+		expect(arrowfn.parameters?.length).toBe(1);
 
 		// Validate that the parameter is 'x'
 		const param = fn.parameters![0];
+		const arrowParam = arrowfn.parameters![0];
 		expect(param.stringify()).toBe("x");
+		expect(arrowParam.stringify()).toBe("x");
 
 		// Expected body content
 		const expectedBody = fn.body as BlockStatement;
-		const expression = expectedBody.statements[0] as InfixExpression;  // This is a simplified string representation of the body
-		testInfixExpression(expression, "x", "+", "2");
+		const expr_stmnt = expectedBody.statements[0] as ExpressionStatement;  
+		expect(testInfixExpression(expr_stmnt.expression, "x", "+", 2)).toBe(true);
+		expect(testInfixExpression(arrowfn.body as InfixExpression, "x", "**", 2)).toBe(true);
 	});
 });
 
@@ -305,6 +313,28 @@ describe("Evaluator - Test Closure", () => {
 			const evaluated = testEval(test.input);  
 			const result = testIntegerObject(evaluated, test.expected); 
 			expect(result).toBe(true);  
+		});
+	});
+});
+
+describe("Evaluator - Test Builtin Functions", () => {
+	const tests = [
+		{input: `len("")`, expected: 0},
+		{input: `len("DorTheShamen")`, expected: 12},
+		{input: `len("iliaboy")`, expected: 7},
+		{input: `len(1)`, expected: "Unsupported argument to `len`, got: integer"},
+		{input: `len("shamen", "boy", "man")`, expected: "Invalid argument count `len` takes 1, got: 3"},
+	];
+ 
+	tests.forEach((test) => {
+		it(`should evaluate '${test.input}' to ${test.expected}`, () => {
+			const evaluated = testEval(test.input);  
+			if(typeof test.expected === 'number'){
+				expect(testIntegerObject(evaluated, Number(test.expected))).toBe(true); 
+			}
+			else {
+				expect(testErrorObj(evaluated, String(test.expected))).toBe(true);  
+			}
 		});
 	});
 });
