@@ -29,13 +29,47 @@ def reduce = f(arr, init, fn) {
 	return iter(arr, init);
 }
 
-def sum = f(arr) => reduce(arr, 0, f(x, y) => x + y);
-def foo = 6;
-def myArray = [1,2,3,4, 4 + 1, foo]
-def squared = map(myArray, f(x) => x ** 2);
-def filtered = filter(myArray, f(x) => x % 2 == 0);
+def concat = f(arr1, arr2) {
+	def iter = f(result, arr) {
+		if (len(arr) == 0) return result;
+		return iter(push(result, first(arr)), rest(arr));
+	}
+	return iter(arr1, arr2);
+}
 
-print("original:", myArray);
-print("squared :", squared);
-print("sum     :", sum(myArray));
-print("filtered:", filtered);
+def zip = f(arr1, arr2) {
+	def iter = f(result, a1, a2) {
+		if (len(a1) == 0) return result;
+		if (len(a2) == 0) return result;
+		return iter(push(result, [first(a1), first(a2)]), rest(a1), rest(a2));
+	}
+	return iter([], arr1, arr2);
+}
+
+def take = f(n, arr) {
+	if(n <= 0) return [] 
+	if(len(arr) == 0) return [];
+	return push(take(n - 1, rest(arr)), first(arr));
+}
+
+def reverse = f(arr) {
+  def iter = f(result, a) {
+    if (len(a) == 0) return result;
+    return iter(push(result, first(a)), rest(a));
+  }
+  return iter([], arr);
+}
+
+def sum = f(arr) => reduce(arr, 0, f(x, y) => x + y);
+
+
+def foo = 6;
+def nums = [1,2,3,4, 4 + 1, foo];
+def strs = ["1", "2", "3", "4", "5", "6"];
+
+print("original:", nums);
+print("sum     :", sum(nums));
+print("squared :", map(nums, f(x) => x ** 2));
+print("filtered:", filter(nums, f(x) => x % 2 == 0));
+print("zipped:", zip(nums, strs));
+print("concat:", concat(nums, strs));

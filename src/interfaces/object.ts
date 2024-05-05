@@ -84,7 +84,9 @@ export class ArrayObj extends Obj {
 		this.elements = elements;
 	}
 
-	public stringify(): string { return `[${this.elements.map(obj => obj.stringify()).join(", ")}]`; };
+	public stringify(): string { 
+		return `[${this.elements.map(obj => obj.type === ObjectType.STRING_OBJ ? `"${obj.stringify()}"` : obj.stringify()).join(", ")}]`; 
+	};
 }
 
 export class FunctionObj extends Obj {
