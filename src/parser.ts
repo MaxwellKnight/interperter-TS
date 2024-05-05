@@ -1,4 +1,5 @@
 import { 
+	ArrayLiteral,
 	ArrowFunctionLiteral,
 	BlockStatement, 
 	BooleanExpression, 
@@ -9,6 +10,7 @@ import {
 	FunctionLiteral, 
 	Identifier, 
 	IfExpression, 
+	IndexExpression, 
 	InfixExpression, 
 	IntegerLiteral, 
 	PrefixExpression, 
@@ -28,7 +30,8 @@ enum Precedence {
 	PRODUCT,
 	PREFIX,
 	POWER,
-	CALL
+	CALL,
+	INDEX
 };
 
 
@@ -46,17 +49,18 @@ PRECEDENCES.set(TokenType.ASTERISK, Precedence.PRODUCT);
 PRECEDENCES.set(TokenType.PERCENT, Precedence.PRODUCT);
 PRECEDENCES.set(TokenType.DOUBLE_ASTERISK, Precedence.POWER);
 PRECEDENCES.set(TokenType.LPAREN, Precedence.CALL);
+PRECEDENCES.set(TokenType.LBRACKET, Precedence.INDEX);
 
-type PrefixFn = () => Expression | null;
-type InfixFn = (expr: Expression) => Expression | null;
+type PrefixFunction = () => Expression | null;
+type InfixFunction = (left: Expression) => Expression | null;
 
 export class Parser {
 	#lexer: Lexer;
 	#errors: string[];
 	#current: Token;
 	#peek: Token;
-	#prefix_fns: Map<TokenType, PrefixFn>
-	#infix_fns: Map<TokenType, InfixFn>
+	#prefix_fns: Map<TokenType, PrefixFunction>
+	#infix_fns: Map<TokenType, InfixFunction>
 
 	constructor(source: string){
 		this.#lexer = new Lexer(source);
@@ -66,11 +70,12 @@ export class Parser {
 		this.advance();
 		this.advance();
 
-		this.#prefix_fns = new Map<TokenType, PrefixFn>();
-		this.#infix_fns = new Map<TokenType, InfixFn>();
+		this.#prefix_fns = new Map<TokenType, PrefixFunction>();
+		this.#infix_fns = new Map<TokenType, InfixFunction>();
 		this.register_prefix(TokenType.IDENTIFIER, this.parse_identifier);
 		this.register_prefix(TokenType.INT, this.parse_integer);
 		this.register_prefix(TokenType.STRING, this.parse_string);
+		this.register_prefix(TokenType.LBRACKET, this.parse_array_literal);
 		this.register_prefix(TokenType.BANG, this.parse_prefix_expression);
 		this.register_prefix(TokenType.MINUS, this.parse_prefix_expression);
 
@@ -83,6 +88,7 @@ export class Parser {
 		this.register_prefix(TokenType.TRUE, this.parse_boolean);
 		this.register_prefix(TokenType.FALSE, this.parse_boolean);
 
+		this.register_infix(TokenType.LBRACKET, this.parse_index_expression);
 		this.register_infix(TokenType.LPAREN, this.parse_call_expression);
 
 		this.register_infix(TokenType.PLUS, this.parse_infix_expression);
@@ -131,11 +137,11 @@ export class Parser {
 		return this.#peek.type == type; 
 	}
 
-	private register_prefix(type: TokenType, fn: PrefixFn): void { 
+	private register_prefix(type: TokenType, fn: PrefixFunction): void { 
 		this.#prefix_fns.set(type, fn); 
 	}
 
-	private register_infix(type: TokenType, fn: InfixFn){ 
+	private register_infix(type: TokenType, fn: InfixFunction){ 
 		this.#infix_fns.set(type, fn); 
 	}
 
@@ -370,30 +376,54 @@ export class Parser {
 	private parse_call_expression(fn: Expression): Expression | null {
 		const expr = new CallExpression(this.#current);
 		expr.function = fn;
-		expr.arguments = this.parse_call_arguments();
+		expr.arguments = this.parse_expression_list(TokenType.RPAREN);
 		return expr;
 	}
 
-	private parse_call_arguments(): Expression[] | null {
-		const args: Expression[] = [];
-		if(this.compare_peek(TokenType.RPAREN)){
+	private parse_array_literal(): Expression | null {
+		const array = new ArrayLiteral(this.#current);
+
+		const elems = this.parse_expression_list(TokenType.RBRACKET);
+		if(!elems) return null;
+		
+		array.elements = elems;
+		return array;
+	}
+
+	private parse_expression_list(end: TokenType): Expression[] | null{
+		const list: Expression[] = [];
+		if(this.compare_peek(end)){
 			this.advance();
-			return args;
+			return list;
 		}
 
 		this.advance();
-		let arg = this.parse_expression(Precedence.LOWEST);
-		if(arg) args.push(arg);
+		let elem = this.parse_expression(Precedence.LOWEST);
+		if(elem) list.push(elem);
 
 		while(this.compare_peek(TokenType.COMMA)){
 			this.advance();
 			this.advance();
-			arg = this.parse_expression(Precedence.LOWEST);
-			if(arg) args.push(arg);
+			elem = this.parse_expression(Precedence.LOWEST);
+			if(elem) list.push(elem);
 		}
+		
+		if(!this.expect(end)) return null;
 
-		if(!this.expect(TokenType.RPAREN)) return null;
+		return list;
+	}
 
-		return args;
+	private parse_index_expression(left: Expression): Expression | null {
+		const index = new IndexExpression(this.#current, left);
+
+		this.advance();
+		const expr = this.parse_expression(Precedence.LOWEST);
+		if(!expr) return null;
+
+		index.index = expr;
+
+		if(!this.expect(TokenType.RBRACKET)) return null;
+
+		return index;
 	}
 }

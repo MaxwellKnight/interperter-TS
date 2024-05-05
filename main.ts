@@ -15,22 +15,22 @@ class REPL {
 
 	public run(): void {
 		while (true) {
-		const source = prompt('>> ');
-		this.processSource(source, true);
+			const source = prompt('>> ');
+			this.process(source, true);
 		}
 	}
 
 	public runFromFile(filePath: string): void {
 		try {
 			const source = fs.readFileSync(filePath, 'utf-8');
-			this.processSource(source, false);
+			this.process(source, false);
 
 		} catch (error: any) {
 			console.error(`Failed to read file: ${error.message}`);
 		}
 	}
 
-	private processSource(source: string, continueOnError: boolean): void {
+	private process(source: string, continueOnError: boolean): void {
 		const parser = new Parser(source);
 		const program = parser.parse_program();
 		const evaluator = new Evaluator();

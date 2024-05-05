@@ -86,8 +86,8 @@ export function testLiteralExpression(expression: any, expectedValue: string | n
 		if (expression instanceof Identifier) {
 			// Test if the expression is an Identifier and its value matches the expected string
 			if (expression.value !== expectedValue) {
-			console.error(`Identifier mismatch. Expected: ${expectedValue}, Got: ${expression.value}`);
-			return false;
+				console.error(`Identifier mismatch. Expected: ${expectedValue}, Got: ${expression.value}`);
+				return false;
 			}
 		} else {
 			console.error(`Expected an Identifier or StringLiteral for string value. Got: ${typeof expression}`);
@@ -97,8 +97,8 @@ export function testLiteralExpression(expression: any, expectedValue: string | n
 		if (expression instanceof IntegerLiteral) {
 			// Test if the expression is an IntegerLiteral and its value matches the expected number
 			if (expression.value !== expectedValue) {
-			console.error(`IntegerLiteral mismatch. Expected: ${expectedValue}, Got: ${expression.value}`);
-			return false;
+				console.error(`IntegerLiteral mismatch. Expected: ${expectedValue}, Got: ${expression.value}`);
+				return false;
 			}
 		} else {
 			console.error(`Expected an IntegerLiteral for numeric value. Got: ${typeof expression}`);
@@ -106,8 +106,8 @@ export function testLiteralExpression(expression: any, expectedValue: string | n
 		}
 	} else if (typeof expectedValue === "boolean") {
 		if (expression instanceof BooleanExpression) {
-			if (expression.value !== expectedValue) {
-			console.error(`BooleanLiteral mismatch. Expected: ${expectedValue}, Got: ${expression.value}`);
+				if (expression.value !== expectedValue) {
+				console.error(`BooleanLiteral mismatch. Expected: ${expectedValue}, Got: ${expression.value}`);
 			return false;
 			}
 		} else {
@@ -122,10 +122,7 @@ export function testLiteralExpression(expression: any, expectedValue: string | n
 	return true;  // If all checks pass, the test is successful
 }
 
-export function testReturnStatement(
-	stmt: Statement,
-	expectedExpression: string
- ): boolean {
+export function testReturnStatement(stmt: Statement, expectedExpression: string): boolean {
 	if (!(stmt instanceof ReturnStatement)) {
 		console.error(`Statement is not a ReturnStatement. Got=${typeof stmt}`);
 		return false;

@@ -7,6 +7,7 @@ export enum ObjectType {
 	BOOLEAN_OBJ = "boolean",
 	RETURN_OBJ = "return",
 	FUNCTION_OBJ = "function",
+	ARRAY_OBJ = "array",
 	BUILTIN_OBJ = "builtin",
 	ERROR_OBJ = "error",
 	NULL_OBJ = "null"
@@ -73,6 +74,17 @@ export class NullObj extends Obj {
 	}
 	
 	public stringify(): string { return "null"; }
+}
+
+export class ArrayObj extends Obj {
+	elements: Obj[];
+
+	constructor(elements: Obj[]){
+		super(ObjectType.ARRAY_OBJ);
+		this.elements = elements;
+	}
+
+	public stringify(): string { return `[${this.elements.map(obj => obj.stringify()).join(", ")}]`; };
 }
 
 export class FunctionObj extends Obj {

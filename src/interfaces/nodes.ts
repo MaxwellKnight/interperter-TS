@@ -283,3 +283,30 @@ export class CallExpression extends Expression {
 		return `${this.function?.stringify()}(${args.join(', ')})`;
 	}
 }
+
+export class ArrayLiteral extends Expression {
+	elements: Expression[];
+
+	constructor(token: Token){
+		super(token);
+		this.elements = [];
+	}
+
+	public stringify(): string { 
+		const elems = this.elements.map((elem) => elem.stringify());
+		return `[${elems.join(", ")}]`;
+	}
+}
+
+export class IndexExpression extends Expression {
+	left: Expression;
+	index: Expression | null;
+
+	constructor(token: Token, left: Expression){
+		super(token);
+		this.left = left;
+		this.index = null;
+	}
+
+	public stringify(): string { return `(${this.left.stringify()}[${this.index?.stringify()}])`; }
+}

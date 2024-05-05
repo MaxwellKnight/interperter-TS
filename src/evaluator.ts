@@ -1,6 +1,6 @@
 import { Enviroment } from "./enviroment";
-import { ArrowFunctionLiteral, BlockStatement, BooleanExpression, CallExpression, DefineStatement, Expression, ExpressionStatement, FunctionLiteral, Identifier, IfExpression, InfixExpression, IntegerLiteral, Node, PrefixExpression, Program, ReturnStatement, Statement, StringLiteral } from "./interfaces/nodes";
-import { BooleanObj, BuiltinObj, ErrorObj, FunctionObj, IntegerObj, NullObj, Obj, ObjectType, ReturnObj, StringObj } from "./interfaces/object";
+import { ArrayLiteral, ArrowFunctionLiteral, BlockStatement, BooleanExpression, CallExpression, DefineStatement, Expression, ExpressionStatement, FunctionLiteral, Identifier, IfExpression, IndexExpression, InfixExpression, IntegerLiteral, Node, PrefixExpression, Program, ReturnStatement, Statement, StringLiteral } from "./interfaces/nodes";
+import { ArrayObj, BooleanObj, BuiltinObj, ErrorObj, FunctionObj, IntegerObj, NullObj, Obj, ObjectType, ReturnObj, StringObj } from "./interfaces/object";
 
 
 const TRUE = new BooleanObj(true);
@@ -19,10 +19,59 @@ export class Evaluator {
 			switch(args[0].type){
 				case ObjectType.STRING_OBJ:
 					return new IntegerObj(args[0].value.toString().length);
+				case ObjectType.ARRAY_OBJ:
+					return new IntegerObj((args[0] as ArrayObj).elements.length);
 				default: 
 					return ErrorObj.create("Unsupported argument to `len`, got:", [args[0].type])
 			}
-		}))
+		}));
+		this.builtins.set("first", new BuiltinObj((...args: Obj[]): Obj => {
+			if(args.length != 1){
+				return ErrorObj.create("Invalid argument count `first` takes 1, got:", [String(args.length)]);
+			}
+			if(!(args[0] instanceof ArrayObj))
+				return ErrorObj.create("`first` accepts only arrays as argument, got:", [args[0].type])
+			if(args[0].elements.length > 0)
+				return args[0].elements[0];
+			
+				return NULL;
+		}));
+		this.builtins.set("last", new BuiltinObj((...args: Obj[]): Obj => {
+			if(args.length != 1){
+				return ErrorObj.create("Invalid argument count `last` takes 1, got:", [String(args.length)]);
+			}
+			if(!(args[0] instanceof ArrayObj))
+				return ErrorObj.create("`last` accepts only arrays as argument, got:", [args[0].type])
+			if(args[0].elements.length > 0)
+				return args[0].elements[args[0].elements.length - 1];
+			
+				return NULL;
+		}));
+		this.builtins.set("rest", new BuiltinObj((...args: Obj[]): Obj => {
+			if(args.length != 1){
+				return ErrorObj.create("Invalid argument count `rest` takes 1, got:", [String(args.length)]);
+			}
+			if(!(args[0] instanceof ArrayObj))
+				return ErrorObj.create("`rest` accepts only arrays as argument, got:", [args[0].type])
+			if(args[0].elements.length > 0)
+				return new ArrayObj(args[0].elements.slice(1));
+			
+				return NULL;
+		}));
+		this.builtins.set("push", new BuiltinObj((...args: Obj[]): Obj => {
+			if(args.length != 2){
+				return ErrorObj.create("Invalid argument count `push` takes 1, got:", [String(args.length)]);
+			}
+			if(!(args[0] instanceof ArrayObj))
+				return ErrorObj.create("first argument to push must be of type `array` got:", [args[0].type])
+			
+			return new ArrayObj([...args[0].elements, args[1]]);
+		}));
+		this.builtins.set("print", new BuiltinObj((...args: Obj[]): Obj => {
+			const strs = args.map(arg => arg.stringify());
+			console.log(strs.join(" "));
+			return NULL;
+		}));
 	};
 
 	/**
@@ -96,6 +145,22 @@ export class Evaluator {
 			if(args.length == 1 && ErrorObj.isError(args[0]))
 				return args[0];
 			return this.apply_function(fn, args);
+		}
+		else if(node instanceof ArrayLiteral) {
+			const elements = this.eval_expressions(node.elements, env);
+			if(elements.length == 1 && ErrorObj.isError(elements[0])){
+				return elements[0];
+			}
+			return new ArrayObj(elements);
+		}
+		else if(node instanceof IndexExpression){
+			const left = this.eval(node.left, env);
+			if(ErrorObj.isError(left)) return left;
+
+			const index = this.eval(node.index, env);
+			if(ErrorObj.isError(index)) return index;
+
+			return this.eval_index_expression(left, index);
 		}
 
 		return NULL;
@@ -255,6 +320,24 @@ export class Evaluator {
 		}
 		return env;
 	}
+
+	private eval_index_expression(left: Obj, index: Obj): Obj{
+		if(left.type === ObjectType.ARRAY_OBJ && index.type === ObjectType.INTEGER_OBJ)
+			return this.eval_array_index_expression(left, index);
+		
+		return ErrorObj.create("index operator not supported on type:", [left.type]);
+	}
+
+	private eval_array_index_expression(left: Obj, index: Obj): Obj{
+		const array = left as ArrayObj;
+		const idx = index.value as number;
+		const max_idx = array.elements.length - 1;
+
+		if(idx < 0 || idx > max_idx) return NULL;
+
+		return array.elements[idx];
+	}
+	
 	private unwrap_return(obj: Obj): Obj{
 		if(obj instanceof ReturnObj)
 			return obj.value;

@@ -1,6 +1,7 @@
 // tests/expression.test.ts
 import { Parser } from "../../src/parser";
-import { ExpressionStatement, Identifier, IntegerLiteral, PrefixExpression, InfixExpression, Expression, StringLiteral } from "../../src/interfaces/nodes";
+import { ExpressionStatement, Identifier, IntegerLiteral, PrefixExpression, InfixExpression, Expression, StringLiteral, ArrayLiteral, IndexExpression } from "../../src/interfaces/nodes";
+import { testIdentifier, testInfixExpression, testLiteralExpression } from "./helper.test";
 
 describe("Parser - Identifier Expression", () => {
 	it("should parse a simple identifier expression", () => {
@@ -47,6 +48,49 @@ describe("Parser - String Literal Expression", () => {
 		const stringLiteral = expressionStatement.expression as StringLiteral;
 
 		expect(stringLiteral.value).toBe("shamenboy the man");
+	});
+});
+
+describe("Parser - Array Literal Expression", () => {
+	it("should parse an array literal expression", () => {
+		const source = `[1, 2, 3 ** 4];\n`;
+		const parser = new Parser(source);
+
+		const program = parser.parse_program();
+
+		expect(program.statements.length).toBe(1);
+
+		const expressionStatement = program.statements[0] as ExpressionStatement;
+		const arrayLiteral = expressionStatement.expression as ArrayLiteral;
+
+		if(!(expressionStatement.expression instanceof ArrayLiteral)){
+			console.error("object is not ArrayLiteral, got: " + expressionStatement.expression?.stringify());
+			return;
+		}
+		if(arrayLiteral.elements.length != 3){
+			console.error("array size mismatch, expected 3, got: " + String(arrayLiteral.elements.length));
+			return;
+		}
+		testLiteralExpression(arrayLiteral.elements[0], 1);
+		testLiteralExpression(arrayLiteral.elements[1], 2);
+		testInfixExpression(arrayLiteral.elements[2], 3, "**", 4);
+	});
+});
+
+describe("Parser - Index Expression", () => {
+	it("should parse an index expression", () => {
+		const source = `shamenboy[5 + 5];\n`;
+		const parser = new Parser(source);
+
+		const program = parser.parse_program();
+
+		expect(program.statements.length).toBe(1);
+
+		const expressionStatement = program.statements[0] as ExpressionStatement;
+		const index_expression = expressionStatement.expression as IndexExpression;
+
+		testIdentifier(index_expression.left, "shamenboy");
+		testInfixExpression(index_expression.index, 5, "+", 5);
 	});
 });
 
@@ -129,6 +173,7 @@ describe("Parser - Infix Expression Parsing", () => {
 		{ input: "a + b ** c / d", expected: "(a + ((b ** c) / d))" },
 		{ input: "a + b * c + d / e", expected: "((a + (b * c)) + (d / e))" },
 		{ input: "3 + 4 * 5", expected: "(3 + (4 * 5))" },
+		{ input: "a * [1, 2, 3, 4][b * c] * d", expected: "((a * ([1, 2, 3, 4][(b * c)])) * d)" },
 		{ input: "5 > 4 == 3 < 4", expected: "((5 > 4) == (3 < 4))" },
 		{ input: "5 > 4 != 3 < 4", expected: "((5 > 4) != (3 < 4))" },
 		{ input: "3 + 4 * 5 == 3 * 1 + 4 * 5", expected: "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))" },
@@ -146,7 +191,6 @@ describe("Parser - Infix Expression Parsing", () => {
 
 			const expressionStatement = program.statements[0] as ExpressionStatement;
 			const expression = expressionStatement.expression as Expression;
-
 			// Check if the parsed expression's string representation matches the expected output
 			expect(expression.stringify()).toBe(test.expected);
 		});
@@ -209,4 +253,4 @@ describe("Parser - Infix Grouped Expression Parsing", () => {
 			expect(expression.stringify()).toBe(test.expected);
 		});
 	});
- });
+});

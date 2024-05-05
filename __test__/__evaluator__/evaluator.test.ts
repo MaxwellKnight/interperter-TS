@@ -1,5 +1,5 @@
 import { BlockStatement, Expression, ExpressionStatement, InfixExpression } from "../../src/interfaces/nodes";
-import { FunctionObj, ObjectType } from "../../src/interfaces/object";
+import { ArrayObj, FunctionObj, ObjectType } from "../../src/interfaces/object";
 import { testInfixExpression } from "../__parser__/helper.test";
 import { testIntegerObject, testBooleanObject, testEval, testNullObject, testErrorObj, testStringObject } from "./helper.test";
 
@@ -116,6 +116,27 @@ describe("Evaluator - String concatenation", () => {
 			const evaluated = testEval(test.input);
 			const result = testStringObject(evaluated, test.expected);
 			expect(result).toBe(true);
+		});
+	});
+});
+
+describe("Evaluator - Array Literals", () => {
+	const tests = [
+		{input: "[1, 2, 3 ** 2]", expected: [1, 2, 9]},
+		{input: "def foo = 5; [foo]", expected: [5]},
+	]
+
+	tests.forEach((test) => {
+		it(`Should evaluate ${test.input} to ${test.expected}`, () => {
+			const evaluated = testEval(test.input);
+			if(!(evaluated instanceof ArrayObj)){
+				console.error("expected ArrayObj instead got: " + evaluated?.type);
+				return;
+			}
+			evaluated.elements.forEach((elem, i) => {
+				const result = testIntegerObject(elem, test.expected[i]);
+				expect(result).toBe(true);
+			})
 		});
 	});
 });
@@ -334,6 +355,28 @@ describe("Evaluator - Test Builtin Functions", () => {
 			}
 			else {
 				expect(testErrorObj(evaluated, String(test.expected))).toBe(true);  
+			}
+		});
+	});
+});
+
+describe("Evaluator - Test Index Expressions", () => {
+	const tests = [
+		{input: "def i = 0; [1][i];", expected: 1},
+		{input: "[1, 2, 3][1 + 1];", expected: 3}, 
+		{input: "def myArray = [1, 2, 3]; myArray[0] + myArray[1] + myArray[2];", expected: 6},
+		{input: "[1, 2, 3][3]", expected: null},
+		{input: "[1, 2, 3][-1]", expected: null}
+	];
+ 
+	tests.forEach((test) => {
+		it(`should evaluate '${test.input}' to ${test.expected}`, () => {
+			const evaluated = testEval(test.input); 
+			if(typeof test.expected === 'number'){
+				expect(testIntegerObject(evaluated, Number(test.expected))).toBe(true); 
+			}
+			else {
+				expect(testNullObject(evaluated)).toBe(true);  
 			}
 		});
 	});
