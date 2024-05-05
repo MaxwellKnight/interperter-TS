@@ -16,6 +16,7 @@ class REPL {
 	public run(): void {
 		while (true) {
 			const source = prompt('>> ');
+			if(source.trim() === "exit") return;
 			this.process(source, true);
 		}
 	}
@@ -31,7 +32,7 @@ class REPL {
 	}
 
 	private process(source: string, should_continue: boolean): void {
-		const parser = new Parser(source);
+		const parser = new Parser(source + ";");
 		const program = parser.parse_program();
 		const evaluator = new Evaluator();
 
