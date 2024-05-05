@@ -170,6 +170,7 @@ export class Parser {
 	}
 
 	private parse_statement(): Statement | null{
+		if(this.#peek.type === TokenType.ASSIGN) return this.parse_define_statement();
 		switch(this.#current.type){
 			case TokenType.DEFINE:
 				return this.parse_define_statement();
@@ -183,7 +184,7 @@ export class Parser {
 	private parse_define_statement(): Statement | null{
 		const stmnt = new DefineStatement(this.#current);
 
-		if(!this.expect(TokenType.IDENTIFIER))
+		if(this.#current.type !== TokenType.IDENTIFIER && !this.expect(TokenType.IDENTIFIER))
 			return null;
 
 		stmnt.name = new Identifier(this.#current);

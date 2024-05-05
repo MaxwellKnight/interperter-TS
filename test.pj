@@ -1,5 +1,5 @@
-def map = f(arr, fn) {
-	def iter = f(arr, acc) {
+map = f(arr, fn) {
+	iter = f(arr, acc) {
 		if(len(arr) == 0)  return acc;
 
 		return iter(rest(arr), push(acc, fn(first(arr))));
@@ -7,8 +7,8 @@ def map = f(arr, fn) {
 	return iter(arr, []);
 }
 
-def filter = f(arr, fn) {
-	def iter = f(arr, acc) {
+filter = f(arr, fn) {
+	iter = f(arr, acc) {
 		if(len(arr) == 0)  return acc;
 		if(fn(first(arr))) 
 			return iter(rest(arr), push(acc, first(arr)));
@@ -18,7 +18,7 @@ def filter = f(arr, fn) {
 	return iter(arr, []);
 }
 
-def reduce = f(arr, init, fn) {
+reduce = f(arr, init, fn) {
 	def iter = f(arr, result) {
 		if(len(arr) == 0) 
 			return result;
@@ -29,16 +29,16 @@ def reduce = f(arr, init, fn) {
 	return iter(arr, init);
 }
 
-def concat = f(arr1, arr2) {
-	def iter = f(result, arr) {
+concat = f(arr1, arr2) {
+	iter = f(result, arr) {
 		if (len(arr) == 0) return result;
 		return iter(push(result, first(arr)), rest(arr));
 	}
 	return iter(arr1, arr2);
 }
 
-def zip = f(arr1, arr2) {
-	def iter = f(result, a1, a2) {
+zip = f(arr1, arr2) {
+	iter = f(result, a1, a2) {
 		if (len(a1) == 0) return result;
 		if (len(a2) == 0) return result;
 		return iter(push(result, [first(a1), first(a2)]), rest(a1), rest(a2));
@@ -46,30 +46,32 @@ def zip = f(arr1, arr2) {
 	return iter([], arr1, arr2);
 }
 
-def take = f(n, arr) {
+take = f(n, arr) {
 	if(n <= 0) return [] 
 	if(len(arr) == 0) return [];
 	return push(take(n - 1, rest(arr)), first(arr));
 }
 
-def reverse = f(arr) {
-  def iter = f(result, a) {
+reverse = f(arr) {
+  iter = f(result, a) {
     if (len(a) == 0) return result;
     return iter(push(result, first(a)), rest(a));
   }
   return iter([], arr);
 }
 
-def sum = f(arr) => reduce(arr, 0, f(x, y) => x + y);
+sum = f(arr) => reduce(arr, 0, f(x, y) => x + y);
 
 
-def foo = 6;
-def nums = [1,2,3,4, 4 + 1, foo];
-def strs = ["1", "2", "3", "4", "5", "6"];
+foo = 6;
+nums = [1,2,3,4, 4 + 1, foo];
+strs = ["1", "2", "3", "4", "5", "6"];
 
-print("original:", nums);
+print("originals:", nums,", ",strs);
 print("sum     :", sum(nums));
 print("squared :", map(nums, f(x) => x ** 2));
 print("filtered:", filter(nums, f(x) => x % 2 == 0));
-print("zipped:", zip(nums, strs));
-print("concat:", concat(nums, strs));
+print("zipped  :", zip(nums, strs));
+print("concat  :", concat(nums, strs));
+x = 5;
+print(x)
