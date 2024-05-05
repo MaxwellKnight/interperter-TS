@@ -30,17 +30,17 @@ class REPL {
 		}
 	}
 
-	private process(source: string, continueOnError: boolean): void {
+	private process(source: string, should_continue: boolean): void {
 		const parser = new Parser(source);
 		const program = parser.parse_program();
 		const evaluator = new Evaluator();
 
 		if (parser.errors().length > 0) {
 			this.print_errors(parser);
-			if (continueOnError) return;
+			if (should_continue) return;
 		} else {
 			const result = evaluator.eval(program, this.#env);
-			console.log(result.stringify());
+			if(should_continue) console.log(result.stringify());
 		}
 	}
 

@@ -1,13 +1,24 @@
-def adder = f(x) {
-	return f(y) =>  x + y;
+def map = f(arr, fn) {
+	def iter = f(arr, acc) {
+		if(len(arr) == 0)  return acc;
+
+		return iter(rest(arr), push(acc, fn(first(arr))));
+	}
+	iter(arr, []);
 }
 
-def fib = f(n) => if (n <= 2) return 1 else return fib(n - 1) + fib(n - 2);
+def reduce = f(arr, init, fn) {
+	def iter = f(arr, result) {
+		if(len(arr) == 0) 
+			return result;
+		
+		return iter(rest(arr), fn(result, first(arr)));
+	}
 
-def addFive = adder(5)
+	iter(arr, init);
+}
 
-def name = "Maxwell the King" + " " + "!!";
-len(name);
-addFive(2);
+def sum = f(arr) => reduce(arr, 0, f(x, y) => x + y);
 
-fib(8);
+def array = map([1,2,3], f(x) => x ** 2);
+print(array, sum(array))
