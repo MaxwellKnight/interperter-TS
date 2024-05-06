@@ -79,34 +79,34 @@ export class Parser {
 		this.register_prefix(TokenType.INT, this.parse_integer);
 		this.register_prefix(TokenType.STRING, this.parse_string);
 		this.register_prefix(TokenType.LBRACKET, this.parse_array_literal);
-		this.register_prefix(TokenType.BANG, this.parse_prefix_expression);
-		this.register_prefix(TokenType.MINUS, this.parse_prefix_expression);
+		this.register_prefix(TokenType.BANG, this.parse_prefix_expr);
+		this.register_prefix(TokenType.MINUS, this.parse_prefix_expr);
 
 		this.register_prefix(TokenType.FUNCTION, this.parse_function_literal);
 
-		this.register_prefix(TokenType.IF, this.parse_if_expression);
+		this.register_prefix(TokenType.IF, this.parse_if_expr);
 
-		this.register_prefix(TokenType.LPAREN, this.parse_grouped_expression);
+		this.register_prefix(TokenType.LPAREN, this.parse_grouped_expr);
 
 		this.register_prefix(TokenType.TRUE, this.parse_boolean);
 		this.register_prefix(TokenType.FALSE, this.parse_boolean);
 
-		this.register_infix(TokenType.LBRACKET, this.parse_index_expression);
-		this.register_infix(TokenType.LPAREN, this.parse_call_expression);
-		this.register_infix(TokenType.DOT, this.parse_member_expression);
+		this.register_infix(TokenType.LBRACKET, this.parse_index_expr);
+		this.register_infix(TokenType.LPAREN, this.parse_call_expr);
+		this.register_infix(TokenType.DOT, this.parse_member_expr);
 
-		this.register_infix(TokenType.PLUS, this.parse_infix_expression);
-		this.register_infix(TokenType.MINUS, this.parse_infix_expression);
-		this.register_infix(TokenType.SLASH, this.parse_infix_expression);
-		this.register_infix(TokenType.ASTERISK, this.parse_infix_expression);
-		this.register_infix(TokenType.PERCENT, this.parse_infix_expression);
-		this.register_infix(TokenType.EQUALS, this.parse_infix_expression);
-		this.register_infix(TokenType.NOT_EQUALS, this.parse_infix_expression);
-		this.register_infix(TokenType.LT, this.parse_infix_expression);
-		this.register_infix(TokenType.GT, this.parse_infix_expression);
-		this.register_infix(TokenType.GTE, this.parse_infix_expression);
-		this.register_infix(TokenType.LTE, this.parse_infix_expression);
-		this.register_infix(TokenType.DOUBLE_ASTERISK, this.parse_infix_expression);
+		this.register_infix(TokenType.PLUS, this.parse_infix_expr);
+		this.register_infix(TokenType.MINUS, this.parse_infix_expr);
+		this.register_infix(TokenType.SLASH, this.parse_infix_expr);
+		this.register_infix(TokenType.ASTERISK, this.parse_infix_expr);
+		this.register_infix(TokenType.PERCENT, this.parse_infix_expr);
+		this.register_infix(TokenType.EQUALS, this.parse_infix_expr);
+		this.register_infix(TokenType.NOT_EQUALS, this.parse_infix_expr);
+		this.register_infix(TokenType.LT, this.parse_infix_expr);
+		this.register_infix(TokenType.GT, this.parse_infix_expr);
+		this.register_infix(TokenType.GTE, this.parse_infix_expr);
+		this.register_infix(TokenType.LTE, this.parse_infix_expr);
+		this.register_infix(TokenType.DOUBLE_ASTERISK, this.parse_infix_expr);
 	}
 
 	private advance(): void{
@@ -183,7 +183,7 @@ export class Parser {
 			case TokenType.RETURN:
 				return this.parse_return_statement();
 			default:
-				return this.parse_expression_statement();
+				return this.parse_expr_statement();
 		}
 	}
 
@@ -199,7 +199,7 @@ export class Parser {
 			return null;
 
 		this.advance();
-		stmnt.value = this.parse_expression(Precedence.LOWEST);
+		stmnt.value = this.parse_expr(Precedence.LOWEST);
 
 		if(this.compare_peek(TokenType.SEMICOLON))
 			this.advance();
@@ -211,7 +211,7 @@ export class Parser {
 		const stmnt = new ReturnStatement(this.#current);
 		this.advance();
 
-		stmnt.value = this.parse_expression(Precedence.LOWEST);
+		stmnt.value = this.parse_expr(Precedence.LOWEST);
 
 		if(this.compare_peek(TokenType.SEMICOLON))
 			this.advance();
@@ -219,9 +219,9 @@ export class Parser {
 		return stmnt;
 	}
 
-	private parse_expression_statement(): ExpressionStatement | null {
+	private parse_expr_statement(): ExpressionStatement | null {
 		const stmnt = new ExpressionStatement(this.#current);
-		stmnt.expression = this.parse_expression(Precedence.LOWEST);
+		stmnt.expression = this.parse_expr(Precedence.LOWEST);
 
 		if(this.compare_peek(TokenType.SEMICOLON))
 			this.advance();
@@ -229,7 +229,7 @@ export class Parser {
 		return stmnt;
 	}
 
-	private parse_expression(precedence: Precedence): Expression | null {
+	private parse_expr(precedence: Precedence): Expression | null {
 		const prefix = this.#prefix_fns.get(this.#current.type)?.bind(this);
 		if(!prefix) return null;
 
@@ -263,25 +263,25 @@ export class Parser {
 		return integer;
 	}
 
-	private parse_prefix_expression(): Expression | null {
+	private parse_prefix_expr(): Expression | null {
 		const expr = new PrefixExpression(this.#current, this.#current.literal);
 		this.advance();
-		expr.right = this.parse_expression(Precedence.PREFIX);
+		expr.right = this.parse_expr(Precedence.PREFIX);
 		return expr;
 	}
 
-	private parse_infix_expression(left: Expression): Expression | null {
+	private parse_infix_expr(left: Expression): Expression | null {
 		const precedence = this.precedence_current();
 		const expr = new InfixExpression(this.#current, this.#current.literal, left);
 		this.advance();
-		expr.right = this.parse_expression(precedence);
+		expr.right = this.parse_expr(precedence);
 		return expr;
 	}
 
-	private parse_grouped_expression(): Expression | null {
+	private parse_grouped_expr(): Expression | null {
 		this.advance();
 
-		const expr = this.parse_expression(Precedence.LOWEST);
+		const expr = this.parse_expr(Precedence.LOWEST);
 
 		if(!this.expect(TokenType.RPAREN))
 			return null;
@@ -289,13 +289,13 @@ export class Parser {
 		return expr;
 	}
 
-	private parse_if_expression(): Expression | null {
+	private parse_if_expr(): Expression | null {
 		const expr = new IfExpression(this.#current);
 
 		if(!this.expect(TokenType.LPAREN)) return null;
 
 		this.advance();
-		expr.condition = this.parse_expression(Precedence.LOWEST);
+		expr.condition = this.parse_expr(Precedence.LOWEST);
 
 		if(!this.expect(TokenType.RPAREN)) return null;
 
@@ -347,7 +347,7 @@ export class Parser {
 
 			fn = new ArrowFunctionLiteral(fn.token);
 			fn.parameters = parameters;
-			fn.body = this.parse_expression(Precedence.LOWEST);
+			fn.body = this.parse_expr(Precedence.LOWEST);
 			return fn;
 		}
 
@@ -380,24 +380,24 @@ export class Parser {
 		return identifiers;
 	}
 
-	private parse_call_expression(caller: Expression): Expression | null {
+	private parse_call_expr(caller: Expression): Expression | null {
 		const expr = new CallExpression(this.#current);
 		expr.caller = caller;
-		expr.arguments = this.parse_expression_list(TokenType.RPAREN);
+		expr.arguments = this.parse_exp_list(TokenType.RPAREN);
 		return expr;
 	}
 
 	private parse_array_literal(): Expression | null {
 		const array = new ArrayLiteral(this.#current);
 
-		const elems = this.parse_expression_list(TokenType.RBRACKET);
+		const elems = this.parse_exp_list(TokenType.RBRACKET);
 		if(!elems) return null;
 		
 		array.elements = elems;
 		return array;
 	}
 
-	private parse_expression_list(end: TokenType): Expression[] | null{
+	private parse_exp_list(end: TokenType): Expression[] | null{
 		const list: Expression[] = [];
 		if(this.compare_peek(end)){
 			this.advance();
@@ -405,13 +405,13 @@ export class Parser {
 		}
 
 		this.advance();
-		let elem = this.parse_expression(Precedence.LOWEST);
+		let elem = this.parse_expr(Precedence.LOWEST);
 		if(elem) list.push(elem);
 
 		while(this.compare_peek(TokenType.COMMA)){
 			this.advance();
 			this.advance();
-			elem = this.parse_expression(Precedence.LOWEST);
+			elem = this.parse_expr(Precedence.LOWEST);
 			if(elem) list.push(elem);
 		}
 		
@@ -420,11 +420,11 @@ export class Parser {
 		return list;
 	}
 
-	private parse_index_expression(left: Expression): Expression | null {
+	private parse_index_expr(left: Expression): Expression | null {
 		const index = new IndexExpression(this.#current, left);
 
 		this.advance();
-		const expr = this.parse_expression(Precedence.LOWEST);
+		const expr = this.parse_expr(Precedence.LOWEST);
 		if(!expr) return null;
 
 		index.index = expr;
@@ -434,12 +434,12 @@ export class Parser {
 		return index;
 	}
 
-	private parse_member_expression(left: Expression): Expression | null {
+	private parse_member_expr(left: Expression): Expression | null {
 		const memeber = new MemberExpression(this.#current, left);
 
 		if(!this.expect(TokenType.IDENTIFIER)) return null;
 
-		memeber.property = this.parse_expression(Precedence.MEMBER);
+		memeber.property = this.parse_expr(Precedence.MEMBER);
 		return memeber;
 	}
 }
