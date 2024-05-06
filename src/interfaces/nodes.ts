@@ -137,7 +137,7 @@ export class StringLiteral extends Expression {
 		this.value = token.literal; 
 	}
 
-	public stringify(): string { return this.token.literal; }
+	public stringify(): string { return `"${this.token.literal}"`; }
 }
 
 export class BooleanExpression extends Expression {
@@ -263,12 +263,12 @@ export class ArrowFunctionLiteral extends Expression {
  * Represents a call expression" expression e.g add(1,2,3)
  */
 export class CallExpression extends Expression {
-	function: Expression | null;
+	caller: Expression | null;
 	arguments: Expression[] | null;
 
 	constructor(token: Token){
 		super(token);
-		this.function = null;
+		this.caller = null;
 		this.arguments = null;
 	}
 
@@ -280,8 +280,21 @@ export class CallExpression extends Expression {
 			}
 		}
 
-		return `${this.function?.stringify()}(${args.join(', ')})`;
+		return `${this.caller?.stringify()}(${args.join(', ')})`;
 	}
+}
+
+export class MemberExpression extends Expression {
+	object: Expression;
+	property: Expression | null;
+
+	constructor(token: Token, object: Expression){
+		super(token);
+		this.object = object;
+		this.property = null;
+	}
+
+	public stringify(): string { return `(${this.object?.stringify()}.${this.property?.stringify()})`; }
 }
 
 export class ArrayLiteral extends Expression {
@@ -294,7 +307,7 @@ export class ArrayLiteral extends Expression {
 
 	public stringify(): string { 
 		const elems = this.elements.map((elem) => elem.stringify());
-		return `[${elems.join(", ")}]`;
+		return `([${elems.join(", ")}])`;
 	}
 }
 

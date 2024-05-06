@@ -58,6 +58,7 @@ export class Lexer {
 			case "[": 	token = new Token(TokenType.LBRACKET, this.#character); 	break;
 			case "]": 	token = new Token(TokenType.RBRACKET, this.#character); 	break;
 			case ",": 	token = new Token(TokenType.COMMA, this.#character);		break;
+			case ".": 	token = new Token(TokenType.DOT, this.#character);			break;
 			case "+": 	token = new Token(TokenType.PLUS, this.#character);		break;
 			case "-": 	token = new Token(TokenType.MINUS, this.#character);		break;
 			case "*":
@@ -84,9 +85,9 @@ export class Lexer {
 				if(this.peek() == '=') 	{
 					let char = this.#character;
 					this.read_char();
-					token = new Token(TokenType.LT, char + this.#character); 
+					token = new Token(TokenType.LTE, char + this.#character); 
 				} else  {
-					token = new Token(TokenType.LTE, this.#character);	
+					token = new Token(TokenType.LT, this.#character);	
 				}	
 				break;
 			case ";": 	token = new Token(TokenType.SEMICOLON, this.#character);	break;

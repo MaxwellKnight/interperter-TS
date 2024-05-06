@@ -13,6 +13,7 @@ import {
 	IndexExpression, 
 	InfixExpression, 
 	IntegerLiteral, 
+	MemberExpression, 
 	PrefixExpression, 
 	Program, 
 	ReturnStatement, 
@@ -30,8 +31,9 @@ enum Precedence {
 	PRODUCT,
 	PREFIX,
 	POWER,
+	INDEX,
+	MEMBER,
 	CALL,
-	INDEX
 };
 
 
@@ -50,6 +52,7 @@ PRECEDENCES.set(TokenType.PERCENT, Precedence.PRODUCT);
 PRECEDENCES.set(TokenType.DOUBLE_ASTERISK, Precedence.POWER);
 PRECEDENCES.set(TokenType.LPAREN, Precedence.CALL);
 PRECEDENCES.set(TokenType.LBRACKET, Precedence.INDEX);
+PRECEDENCES.set(TokenType.DOT, Precedence.MEMBER);
 
 type PrefixFunction = () => Expression | null;
 type InfixFunction = (left: Expression) => Expression | null;
@@ -90,6 +93,7 @@ export class Parser {
 
 		this.register_infix(TokenType.LBRACKET, this.parse_index_expression);
 		this.register_infix(TokenType.LPAREN, this.parse_call_expression);
+		this.register_infix(TokenType.DOT, this.parse_member_expression);
 
 		this.register_infix(TokenType.PLUS, this.parse_infix_expression);
 		this.register_infix(TokenType.MINUS, this.parse_infix_expression);
@@ -170,10 +174,12 @@ export class Parser {
 	}
 
 	private parse_statement(): Statement | null{
-		if(this.#peek.type === TokenType.ASSIGN) return this.parse_define_statement();
+		if(this.#peek.type === TokenType.ASSIGN) 
+			return this.parse_assignment_statement();
+		
 		switch(this.#current.type){
 			case TokenType.DEFINE:
-				return this.parse_define_statement();
+				return this.parse_assignment_statement();
 			case TokenType.RETURN:
 				return this.parse_return_statement();
 			default:
@@ -181,7 +187,7 @@ export class Parser {
 		}
 	}
 
-	private parse_define_statement(): Statement | null{
+	private parse_assignment_statement(): Statement | null{
 		const stmnt = new DefineStatement(this.#current);
 
 		if(this.#current.type !== TokenType.IDENTIFIER && !this.expect(TokenType.IDENTIFIER))
@@ -374,9 +380,9 @@ export class Parser {
 		return identifiers;
 	}
 
-	private parse_call_expression(fn: Expression): Expression | null {
+	private parse_call_expression(caller: Expression): Expression | null {
 		const expr = new CallExpression(this.#current);
-		expr.function = fn;
+		expr.caller = caller;
 		expr.arguments = this.parse_expression_list(TokenType.RPAREN);
 		return expr;
 	}
@@ -426,5 +432,14 @@ export class Parser {
 		if(!this.expect(TokenType.RBRACKET)) return null;
 
 		return index;
+	}
+
+	private parse_member_expression(left: Expression): Expression | null {
+		const memeber = new MemberExpression(this.#current, left);
+
+		if(!this.expect(TokenType.IDENTIFIER)) return null;
+
+		memeber.property = this.parse_expression(Precedence.MEMBER);
+		return memeber;
 	}
 }

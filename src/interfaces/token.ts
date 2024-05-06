@@ -34,6 +34,7 @@ export enum TokenType {
 	IF = "if",
 	ELSE = "else",
 	RETURN = "return",
+	DOT = "dot",
 	BANG = "bang" // `!` symbol
 }
 

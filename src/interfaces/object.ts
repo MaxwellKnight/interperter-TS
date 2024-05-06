@@ -19,8 +19,10 @@ export type BuiltinFunction = (...args: Obj[]) => Obj
 export abstract class Obj {
 	type: ObjectType; // Type of the object
 	value!: ObjectValue;
+	properties: Map<ObjectValue, Obj>;
 
 	constructor(type: ObjectType){
+		this.properties = new Map<ObjectValue, Obj>;
 		this.type = type;
 	}
 
@@ -45,7 +47,7 @@ export class StringObj extends Obj {
 		this.value = value;
 	}
 	
-	public stringify(): string { return `${this.value}`; }
+	public stringify(): string { return `"${this.value}"`; }
 }
 
 export class BooleanObj extends Obj {
@@ -85,7 +87,7 @@ export class ArrayObj extends Obj {
 	}
 
 	public stringify(): string { 
-		return `[${this.elements.map(obj => obj.type === ObjectType.STRING_OBJ ? `"${obj.stringify()}"` : obj.stringify()).join(", ")}]`; 
+		return `[${this.elements.map(obj => obj.stringify()).join(", ")}]`; 
 	};
 }
 

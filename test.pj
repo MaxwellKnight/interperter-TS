@@ -18,7 +18,7 @@ filter = f(arr, fn) {
 	return iter(arr, []);
 }
 
-reduce = f(arr, init, fn) {
+reduce = f(arr, fn, init) {
 	def iter = f(arr, result) {
 		if(len(arr) == 0) 
 			return result;
@@ -52,26 +52,34 @@ take = f(n, arr) {
 	return push(take(n - 1, rest(arr)), first(arr));
 }
 
-reverse = f(arr) {
-  iter = f(result, a) {
-    if (len(a) == 0) return result;
-    return iter(push(result, first(a)), rest(a));
-  }
-  return iter([], arr);
+drop = f(n, arr) {
+	if(len(arr) == 0) return [];
+	if(n <= 0) return push(drop(n, rest(arr)), first(arr));
+	return drop(n - 1, rest(arr));
 }
 
-sum = f(arr) => reduce(arr, 0, f(x, y) => x + y);
+reverse = f(arr) => take(len(arr), arr);
 
+sum = f(arr) => reduce(arr, f(x, y) => x + y, 0);
+product = f(arr) => reduce(arr, f(x, y) => x * y, 1);
+
+strcat = f(arr) => reduce(arr, f(x, y) => x + y, "");
 
 foo = 6;
-nums = [1,2,3,4, 4 + 1, foo];
-strs = ["1", "2", "3", "4", "5", "6"];
+nums = [1,2,3,4, 4 + 1, foo, foo + 1];
+strs = ["1", "2", "3", "4", "5", "6", (f() => "7")()];
 
-print("originals:", nums,", ",strs);
+print("nums    :", nums, "	strs:", strs);
 print("sum     :", sum(nums));
+print("product :", product(nums));
 print("squared :", map(nums, f(x) => x ** 2));
+print("strcat  :", strcat(strs));
 print("filtered:", filter(nums, f(x) => x % 2 == 0));
 print("zipped  :", zip(nums, strs));
 print("concat  :", concat(nums, strs));
-x = 5;
-print(x)
+print("drop    :", drop(4, strs));
+print("take    :", reverse(take(4, strs)));
+print("reverse :", reverse(strs));
+
+A = nums.filter(f(x) => x % 2 == 0)
+		  .map(f(x) => x ** 2)

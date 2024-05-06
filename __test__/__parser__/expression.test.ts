@@ -173,7 +173,7 @@ describe("Parser - Infix Expression Parsing", () => {
 		{ input: "a + b ** c / d", expected: "(a + ((b ** c) / d))" },
 		{ input: "a + b * c + d / e", expected: "((a + (b * c)) + (d / e))" },
 		{ input: "3 + 4 * 5", expected: "(3 + (4 * 5))" },
-		{ input: "a * [1, 2, 3, 4][b * c] * d", expected: "((a * ([1, 2, 3, 4][(b * c)])) * d)" },
+		{ input: "a * [1, 2, 3, 4][b * c] * d", expected: "((a * (([1, 2, 3, 4])[(b * c)])) * d)" },
 		{ input: "5 > 4 == 3 < 4", expected: "((5 > 4) == (3 < 4))" },
 		{ input: "5 > 4 != 3 < 4", expected: "((5 > 4) != (3 < 4))" },
 		{ input: "3 + 4 * 5 == 3 * 1 + 4 * 5", expected: "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))" },
@@ -238,6 +238,35 @@ describe("Parser - Infix Grouped Expression Parsing", () => {
  
 	tests.forEach((test) => {
 		it(`should correctly parse '${test.input}'`, () => {
+			const parser = new Parser(test.input);
+			const program = parser.parse_program();
+
+			// Check if there are no parsing errors
+			expect(parser.errors().length).toBe(0);
+			// Ensure there is exactly one statement in the program
+			expect(program.statements.length).toBe(1);
+
+			const expressionStatement = program.statements[0] as ExpressionStatement;
+			const expression = expressionStatement.expression as Expression;
+
+			// Check if the parsed expression's string representation matches the expected output
+			expect(expression.stringify()).toBe(test.expected);
+		});
+	});
+});
+
+describe("Parser - Member Expression Parsing", () => {
+	const tests = [
+		{ input: "max.the.king[0]", expected: "(((max.the).king)[0])" },
+		{ input: "max.the.king()[0]", expected: "(((max.the).king())[0])" },
+		{ input: "5 * 2 + or.yona", expected: "((5 * 2) + (or.yona))" },
+		{ input: "5 / dor.shamen", expected: "(5 / (dor.shamen))" },
+		{ input: `lior.the.shamen["duby"]`, expected: `(((lior.the).shamen)["duby"])` },
+		{ input: `[1, 2, 3].sort()`, expected: `(([1, 2, 3]).sort())` },
+	];
+ 
+	tests.forEach((test) => {
+		it(`should correctly parse '${test.input} to '${test.expected}'`, () => {
 			const parser = new Parser(test.input);
 			const program = parser.parse_program();
 

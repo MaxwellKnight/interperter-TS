@@ -68,7 +68,7 @@ export class Evaluator {
 			return new ArrayObj([...args[0].elements, args[1]]);
 		}));
 		this.builtins.set("print", new BuiltinObj((...args: Obj[]): Obj => {
-			const strs = args.map(arg => arg.stringify());
+			const strs = args.map(arg => arg.type === ObjectType.STRING_OBJ ? arg.stringify().slice(1, - 1) : arg.stringify());
 			console.log(strs.join(" "));
 			return NULL;
 		}));
@@ -138,7 +138,7 @@ export class Evaluator {
 			return fn;
 		}
 		else if(node instanceof CallExpression){
-			const fn = this.eval(node.function, env);
+			const fn = this.eval(node.caller, env);
 			if(ErrorObj.isError(fn)) return fn;
 
 			const args = this.eval_expressions(node.arguments || [], env);

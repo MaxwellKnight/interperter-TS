@@ -95,7 +95,7 @@ describe("Parser - Call Expression Parsing", () => {
 		const callExpression = stmt.expression as CallExpression;  // Assert the expression is a CallExpression
 
 		// Validate the function being called is an identifier "add"
-		expect(testIdentifier(callExpression.function, "add")).toBe(true);
+		expect(testIdentifier(callExpression.caller, "add")).toBe(true);
 
 		// Validate the correct number of arguments
 		expect(callExpression.arguments?.length).toBe(3);
