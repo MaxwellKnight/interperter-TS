@@ -1,6 +1,6 @@
 import { Parser } from "../../src/parser";
 import { BlockStatement, ExpressionStatement, Identifier, IfExpression } from "../../src/interfaces/nodes";
-import { checkParserErrors, testIdentifier, testInfixExpression } from "./helper.test";
+import { checkParserErrors, testIdentifier, testInfixExpression } from "./helper";
 
 // Test suite for If Expressions
 describe("Parser - If Expressions", () => {

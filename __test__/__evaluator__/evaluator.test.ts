@@ -1,7 +1,7 @@
 import { BlockStatement, Expression, ExpressionStatement, InfixExpression } from "../../src/interfaces/nodes";
 import { ArrayObj, FunctionObj, ObjectType } from "../../src/interfaces/object";
-import { testInfixExpression } from "../__parser__/helper.test";
-import { testIntegerObject, testBooleanObject, testEval, testNullObject, testErrorObj, testStringObject, testArrayObject } from "./helper.test";
+import { testInfixExpression } from "../__parser__/helper";
+import { testIntegerObject, testBooleanObject, testEval, testNullObject, testErrorObj, testStringObject, testArrayObject } from "./helper";
 
 describe("Evaluator - Integer, Boolean and String Expression Evaluation", () => {
 	// Define the test cases

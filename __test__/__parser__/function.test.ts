@@ -1,7 +1,6 @@
 import { ArrowFunctionLiteral, BlockStatement, CallExpression, DefineStatement, Expression, ExpressionStatement, FunctionLiteral, Identifier, InfixExpression } from "../../src/interfaces/nodes";
 import { Parser } from "../../src/parser";
-import { testIdentifier, testInfixExpression, testLiteralExpression } from "./helper.test";
-import { checkParserErrors } from "./helper.test";
+import { testIdentifier, testInfixExpression, testLiteralExpression, checkParserErrors } from "./helper";
 
 describe("Parser - Functions", () => {
 	it("Should parse function parameters correctly", () => {

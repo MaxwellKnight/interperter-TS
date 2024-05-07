@@ -2,7 +2,7 @@ import { Enviroment } from "../../src/enviroment";
 import { Evaluator } from "../../src/evaluator";
 import { ArrayObj, BooleanObj, ErrorObj, IntegerObj, NullObj, Obj, StringObj } from "../../src/interfaces/object";
 import { Parser } from "../../src/parser";
-import { checkParserErrors } from "../__parser__/helper.test";
+import { checkParserErrors } from "../__parser__/helper";
 
 // Function to test if an object is an IntegerObj with the expected value
 export function testIntegerObject(obj: Obj | null, expected: number): boolean {

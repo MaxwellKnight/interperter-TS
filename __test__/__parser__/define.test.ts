@@ -1,6 +1,6 @@
 import { DefineStatement } from "../../src/interfaces/nodes";
 import { Parser } from "../../src/parser";
-import { checkParserErrors, testLiteralExpression } from "./helper.test";
+import { checkParserErrors, testLiteralExpression } from "./helper";
 
 describe("Parser - Let Statements", () => {
 	const tests = [

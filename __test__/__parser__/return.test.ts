@@ -1,6 +1,6 @@
 import { ReturnStatement, Statement } from "../../src/interfaces/nodes";
 import { Parser } from "../../src/parser";
-import { testReturnStatement } from "./helper.test";
+import { testReturnStatement } from "./helper";
  // Test case for parsing return statements
  describe("Parser - Return Statements", () => {
 	it("should parse a simple return statement", () => {
