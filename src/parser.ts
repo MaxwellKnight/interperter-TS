@@ -219,7 +219,7 @@ export class Parser {
 		return stmnt;
 	}
 
-	private parse_expr_statement(): ExpressionStatement | null {
+	private parse_expr_statement(): ExpressionStatement {
 		const stmnt = new ExpressionStatement(this.#current);
 		stmnt.expression = this.parse_expr(Precedence.LOWEST);
 
@@ -230,12 +230,12 @@ export class Parser {
 	}
 
 	private parse_expr(precedence: Precedence): Expression | null {
-		const prefix = this.#prefix_fns.get(this.#current.type)?.bind(this);
+		const prefix = this.#prefix_fns.get(this.#current.type)!.bind(this);
 		if(!prefix) return null;
 
 		let left = prefix() as Expression;
 		while(!this.compare_current(TokenType.SEMICOLON) && precedence < this.precedence_peek()){
-			const infix = this.#infix_fns.get(this.#peek.type)?.bind(this);
+			const infix = this.#infix_fns.get(this.#peek.type)!.bind(this);
 			if(!infix) return left;
 			
 			this.advance();
@@ -245,9 +245,9 @@ export class Parser {
 		return left;
 	}
 
-	private parse_identifier(): Expression | null { return new Identifier(this.#current); }
-	private parse_boolean(): Expression | null { return new BooleanExpression(this.#current, this.compare_current(TokenType.TRUE)); }
-	private parse_string(): Expression | null { 
+	private parse_identifier(): Expression { return new Identifier(this.#current); }
+	private parse_boolean(): Expression { return new BooleanExpression(this.#current, this.compare_current(TokenType.TRUE)); }
+	private parse_string(): Expression { 
 		const str = new  StringLiteral(this.#current);
 		str.value = this.#current.literal;
 		return str; 
@@ -263,14 +263,14 @@ export class Parser {
 		return integer;
 	}
 
-	private parse_prefix_expr(): Expression | null {
+	private parse_prefix_expr(): Expression {
 		const expr = new PrefixExpression(this.#current, this.#current.literal);
 		this.advance();
 		expr.right = this.parse_expr(Precedence.PREFIX);
 		return expr;
 	}
 
-	private parse_infix_expr(left: Expression): Expression | null {
+	private parse_infix_expr(left: Expression): Expression {
 		const precedence = this.precedence_current();
 		const expr = new InfixExpression(this.#current, this.#current.literal, left);
 		this.advance();

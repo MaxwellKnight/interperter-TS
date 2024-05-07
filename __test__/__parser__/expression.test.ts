@@ -263,6 +263,7 @@ describe("Parser - Member Expression Parsing", () => {
 		{ input: "5 / dor.shamen", expected: "(5 / (dor.shamen))" },
 		{ input: `lior.the.shamen["duby"]`, expected: `(((lior.the).shamen)["duby"])` },
 		{ input: `[1, 2, 3].sort()`, expected: `(([1, 2, 3]).sort())` },
+		{ input: `[1, 2, 3].sort().map(x, y)`, expected: `((([1, 2, 3]).sort()).map(x, y))` },
 	];
  
 	tests.forEach((test) => {

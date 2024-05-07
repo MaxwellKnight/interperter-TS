@@ -107,6 +107,7 @@ describe('Lexer', () => {
 		"shamen"
 		"uglyfaceman"
 		"		\n		"
+		"		\t\r\n		"
 		[foo, 6]
 		`)
 
@@ -196,6 +197,7 @@ describe('Lexer', () => {
 			new Token(TokenType.STRING, 'shamen'),
 			new Token(TokenType.STRING, 'uglyfaceman'),
 			new Token(TokenType.STRING, '		\n		'),
+			new Token(TokenType.STRING, '		\t\r\n		'),
 			new Token(TokenType.LBRACKET, '['),
 			new Token(TokenType.IDENTIFIER, 'foo'),
 			new Token(TokenType.COMMA, ','),

@@ -3,9 +3,9 @@ import { ArrayLiteral, ArrowFunctionLiteral, BlockStatement, BooleanExpression, 
 import { ArrayObj, BooleanObj, BuiltinObj, ErrorObj, FunctionObj, IntegerObj, NullObj, Obj, ObjectType, ReturnObj, StringObj } from "./interfaces/object";
 
 
-const TRUE = new BooleanObj(true);
-const FALSE = new BooleanObj(false);
-const NULL = new NullObj();
+export const TRUE = new BooleanObj(true);
+export const FALSE = new BooleanObj(false);
+export const NULL = new NullObj();
 
 export class Evaluator {
 	builtins: Map<string, BuiltinObj>;

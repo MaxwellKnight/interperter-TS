@@ -1,4 +1,5 @@
 import { Enviroment } from "../enviroment";
+import { NULL } from "../evaluator";
 import { BlockStatement, Expression, ExpressionStatement, Identifier } from "./nodes";
 
 export enum ObjectType {
@@ -14,12 +15,13 @@ export enum ObjectType {
 }
 export type ObjectValue = number | string | boolean | Obj
 export type BuiltinFunction = (...args: Obj[]) => Obj
+export type MemberFunction = (self: Obj, ...args: Obj[]) => Obj;
 
 // Base class for all objects in the interpreter
 export abstract class Obj {
 	type: ObjectType; // Type of the object
 	value!: ObjectValue;
-	properties: Map<ObjectValue, Obj>;
+	properties: Map<ObjectValue, Obj | MemberFunction>;
 
 	constructor(type: ObjectType){
 		this.properties = new Map<ObjectValue, Obj>;
@@ -84,11 +86,23 @@ export class ArrayObj extends Obj {
 	constructor(elements: Obj[]){
 		super(ObjectType.ARRAY_OBJ);
 		this.elements = elements;
+		this.properties.set('push', ArrayObj.push.bind(this));
 	}
 
 	public stringify(): string { 
 		return `[${this.elements.map(obj => obj.stringify()).join(", ")}]`; 
 	};
+
+	static push(self: Obj, ...args: Obj[]): Obj  {
+		if(!(self instanceof ArrayObj)) {
+			return ErrorObj.create("first argument to push must be of type `array` got:", [self.type])
+		}
+		if(args.length != 1){
+			return ErrorObj.create("Invalid argument count `push` takes 1, got:", [String(args.length)]);
+		}	
+		
+		return new ArrayObj([...self.elements, args[0]]);
+	}
 }
 
 export class FunctionObj extends Obj {

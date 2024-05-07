@@ -1,7 +1,7 @@
 import { BlockStatement, Expression, ExpressionStatement, InfixExpression } from "../../src/interfaces/nodes";
 import { ArrayObj, FunctionObj, ObjectType } from "../../src/interfaces/object";
 import { testInfixExpression } from "../__parser__/helper.test";
-import { testIntegerObject, testBooleanObject, testEval, testNullObject, testErrorObj, testStringObject } from "./helper.test";
+import { testIntegerObject, testBooleanObject, testEval, testNullObject, testErrorObj, testStringObject, testArrayObject } from "./helper.test";
 
 describe("Evaluator - Integer, Boolean and String Expression Evaluation", () => {
 	// Define the test cases
@@ -378,6 +378,19 @@ describe("Evaluator - Test Index Expressions", () => {
 			else {
 				expect(testNullObject(evaluated)).toBe(true);  
 			}
+		});
+	});
+});
+
+describe("Evaluator - Test Member Expressions", () => {
+	const tests = [
+		{input: "[1, 2, 3].push(4)", expected: [1, 2, 3, 4]},
+	];
+ 
+	tests.forEach((test) => {
+		it(`should evaluate '${test.input}' to ${test.expected}`, () => {
+			const evaluated = testEval(test.input); 
+			expect(testArrayObject(evaluated, test.expected)).toBe(true);
 		});
 	});
 });
