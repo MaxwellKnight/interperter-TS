@@ -83,3 +83,13 @@ print("reverse :", reverse(strs));
 
 A = nums.filter(f(x) => x % 2 == 0)
 		  .map(f(x) => x ** 2)
+		  .reduce(f(x, y) => x + y, 10);
+
+print("nums after filter even then squred and added: ", A);
+
+create_rlist = f(rlist) {
+	if(len(rlist) == 0) return null
+	return [first(rlist), create_rlist(rest(rlist))]
+}
+
+print(create_rlist([1,2,3,4]))

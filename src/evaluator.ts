@@ -1,22 +1,18 @@
 import { Enviroment, builtin_first, builtin_last, builtin_len, builtin_print, builtin_rest } from "./enviroment";
 import { ArrayLiteral, ArrowFunctionLiteral, BlockStatement, BooleanExpression, CallExpression, DefineStatement, Expression, ExpressionStatement, FunctionLiteral, Identifier, IfExpression, IndexExpression, InfixExpression, IntegerLiteral, MemberExpression, Node, PrefixExpression, Program, ReturnStatement, Statement, StringLiteral } from "./interfaces/nodes";
-import { ArrayObj, BooleanObj, BuiltinObj, ErrorObj, FunctionObj, IntegerObj, NullObj, Obj, ObjectType, ReturnObj, StringObj } from "./interfaces/object";
+import { ArrayObj, BooleanObj, BuiltinObj, ErrorObj, FALSE, FunctionObj, IntegerObj, NULL, NullObj, Obj, ObjectType, ReturnObj, StringObj, TRUE } from "./interfaces/object";
 
-
-export const TRUE = new BooleanObj(true);
-export const FALSE = new BooleanObj(false);
-export const NULL = new NullObj();
-
-export class Evaluator {
-	builtins: Map<string, BuiltinObj>;
+class Evaluator {
+	builtins: Map<string, BuiltinObj | NullObj>;
 
 	constructor() {
-		this.builtins = new Map<string, BuiltinObj>;
-		this.builtins.set("len", 	builtin_len);
-		this.builtins.set("first", builtin_first);
-		this.builtins.set("last", 	builtin_last);
-		this.builtins.set("rest", 	builtin_rest);
-		this.builtins.set("print", builtin_print);
+		this.builtins = new Map<string, BuiltinObj | NullObj>;
+		this.builtins.set("len", 	new BuiltinObj(builtin_len));
+		this.builtins.set("first", new BuiltinObj(builtin_first));
+		this.builtins.set("last", 	new BuiltinObj(builtin_last));
+		this.builtins.set("rest", 	new BuiltinObj(builtin_rest));
+		this.builtins.set("print", new BuiltinObj(builtin_print));
+		this.builtins.set("null", 	new NullObj());
 	};
 
 	/**
@@ -235,7 +231,7 @@ export class Evaluator {
 		return result;
 	}
 
-	private apply_function(fn: Obj, args: Obj[]): Obj{
+	public apply_function(fn: Obj, args: Obj[]): Obj{
 		if(fn instanceof FunctionObj){
 			const extendedEnv = this.extend_function_env(fn, args);
 			const result = this.eval(fn.body, extendedEnv);
@@ -280,7 +276,7 @@ export class Evaluator {
 			if(!property) 
 				return ErrorObj.create(`Property named "${node.property.caller.value}" does not exist on type: Array`, []);
 			if(typeof property !== 'function') 
-				return ErrorObj.create(`"${node.property.caller.value}" is not a function. got:`, [property.type]);
+				return ErrorObj.create(`"${node.property.caller.value}" is not a function. got:`, [property.toString()]);
 ;
 			return property(obj, ...this.eval_expressions(node.property.arguments || [], env));
 		}
@@ -304,4 +300,9 @@ export class Evaluator {
 		else if(obj instanceof BooleanObj) return obj.value;
 		return true;
 	}
- }
+}
+
+export {
+	Evaluator, 
+	NULL,
+}

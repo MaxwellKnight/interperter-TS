@@ -1,6 +1,6 @@
 import { Enviroment } from "../enviroment";
-import { NULL } from "../evaluator";
-import { BlockStatement, Expression, ExpressionStatement, Identifier } from "./nodes";
+import { Evaluator } from "../evaluator";
+import { BlockStatement, Expression, Identifier } from "./nodes";
 
 export enum ObjectType {
 	INTEGER_OBJ = "integer",
@@ -87,6 +87,9 @@ export class ArrayObj extends Obj {
 		super(ObjectType.ARRAY_OBJ);
 		this.elements = elements;
 		this.properties.set('push', ArrayObj.push);
+		this.properties.set('filter', ArrayObj.filter);
+		this.properties.set('map', ArrayObj.map);
+		this.properties.set('reduce', ArrayObj.reduce);
 	}
 
 	public stringify(): string { 
@@ -95,13 +98,81 @@ export class ArrayObj extends Obj {
 
 	static push(self: Obj, ...args: Obj[]): Obj  {
 		if(!(self instanceof ArrayObj)) {
-			return ErrorObj.create("first argument to push must be of type `array` got:", [self.type])
+			return ErrorObj.create("first argument to `push` must be of type `array` got:", [self.type])
 		}
 		if(args.length != 1){
 			return ErrorObj.create("Invalid argument count `push` takes 1, got:", [String(args.length)]);
 		}	
 		
 		return new ArrayObj([...self.elements, args[0]]);
+	}
+
+	static filter(self: Obj, ...args: Obj[]): Obj  {
+		if(!(self instanceof ArrayObj)) {
+			return ErrorObj.create("first argument to `filter` must be of type `array` got:", [self.type])
+		}
+		if(args.length != 1){
+			return ErrorObj.create("Invalid argument count `filter` takes 1, got:", [String(args.length)]);
+		}
+		
+		if(args[0].type !== ObjectType.FUNCTION_OBJ) return ErrorObj.create("`filter` takes a function as argument", []);
+
+		const evaluator = new Evaluator();
+		const result: Obj[] = [];
+		for(let i = 0; i < self.elements.length; i += 1){
+			const ans = evaluator.apply_function(args[0], [self.elements[i]]);
+			if(ans.type !== ObjectType.BOOLEAN_OBJ){
+				return ErrorObj.create("function to `filter` must return a boolean.", []);
+			}
+			if(ans.value) result.push(self.elements[i]);
+		}
+		
+		return new ArrayObj(result);
+	}
+
+	static map(self: Obj, ...args: Obj[]): Obj  {
+		if(!(self instanceof ArrayObj)) {
+			return ErrorObj.create("first argument to `filter` must be of type `array` got:", [self.type])
+		}
+		if(args.length != 1){
+			return ErrorObj.create("Invalid argument count `filter` takes 1, got:", [String(args.length)]);
+		}
+		
+		if(args[0].type !== ObjectType.FUNCTION_OBJ) return ErrorObj.create("`filter` takes a function as argument", []);
+
+		const evaluator = new Evaluator();
+		const result: Obj[] = [];
+		for(let i = 0; i < self.elements.length; i += 1){
+			const ans = evaluator.apply_function(args[0], [self.elements[i]]);
+			result.push(ans);
+		}
+		
+		return new ArrayObj(result);
+	}
+
+	static reduce(self: Obj, ...args: Obj[]): Obj {
+		if (!(self instanceof ArrayObj))
+			return ErrorObj.create('First argument to `reduce` must be of type `array`, got:',[self.type]);
+		
+		if (args.length < 1 || args.length > 2) 
+			return ErrorObj.create('Invalid argument count `reduce` takes 1 or 2, got:', [String(args.length)]);
+
+  
+		const reducer = args[0];
+		if (reducer.type !== ObjectType.FUNCTION_OBJ)
+			return ErrorObj.create('`reduce` requires a reducer function as the first argument',[]);
+
+		let accumulator: Obj;
+		if (args.length === 2) accumulator = args[1];
+		else 	accumulator = self.elements[0];
+		
+		const evaluator = new Evaluator();
+		const startIndex = args.length === 2 ? 0 : 1;
+  
+		for (let i = startIndex; i < self.elements.length; i += 1)
+		  accumulator = evaluator.apply_function(reducer, [accumulator,self.elements[i]]);
+  
+		return accumulator;
 	}
 }
 
@@ -151,3 +222,8 @@ export class ErrorObj extends Obj {
 
 	public stringify(): string { return `ERROR: ${this.value}`; }
 }
+
+export const TRUE = new BooleanObj(true);
+export const FALSE = new BooleanObj(false);
+export const NULL = new NullObj();
+

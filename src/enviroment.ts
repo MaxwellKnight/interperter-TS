@@ -1,7 +1,7 @@
 import { NULL } from "./evaluator";
-import { ArrayObj, BuiltinObj, ErrorObj, IntegerObj, Obj, ObjectType } from "./interfaces/object";
+import { ArrayObj, ErrorObj, IntegerObj, NullObj, Obj, ObjectType } from "./interfaces/object";
 
-export class Enviroment {
+class Enviroment {
 	#env: Map<string, Obj>;
 	#parent: Enviroment | null;
 
@@ -23,7 +23,7 @@ export class Enviroment {
 	}
 }
 
-export const builtin_len = new BuiltinObj((...args: Obj[]): Obj => {
+const builtin_len = (...args: Obj[]): Obj => {
 	if(args.length != 1){
 		return ErrorObj.create("Invalid argument count `len` takes 1, got:", [String(args.length)]);
 	}
@@ -35,9 +35,9 @@ export const builtin_len = new BuiltinObj((...args: Obj[]): Obj => {
 		default: 
 			return ErrorObj.create("Unsupported argument to `len`, got:", [args[0].type])
 	}
-});
+};
 
-export const builtin_first = new BuiltinObj((...args: Obj[]): Obj => {
+const builtin_first = (...args: Obj[]): Obj => {
 	if(args.length != 1){
 		return ErrorObj.create("Invalid argument count `first` takes 1, got:", [String(args.length)]);
 	}
@@ -47,9 +47,9 @@ export const builtin_first = new BuiltinObj((...args: Obj[]): Obj => {
 		return args[0].elements[0];
 	
 	return NULL;
-});
+};
 
-export const builtin_last = new BuiltinObj((...args: Obj[]): Obj => {
+const builtin_last = (...args: Obj[]): Obj => {
 	if(args.length != 1){
 		return ErrorObj.create("Invalid argument count `last` takes 1, got:", [String(args.length)]);
 	}
@@ -59,9 +59,9 @@ export const builtin_last = new BuiltinObj((...args: Obj[]): Obj => {
 		return args[0].elements[args[0].elements.length - 1];
 	
 		return NULL;
-});
+};
 
-export const builtin_rest = new BuiltinObj((...args: Obj[]): Obj => {
+const builtin_rest = (...args: Obj[]): Obj => {
 	if(args.length != 1){
 		return ErrorObj.create("Invalid argument count `rest` takes 1, got:", [String(args.length)]);
 	}
@@ -71,10 +71,19 @@ export const builtin_rest = new BuiltinObj((...args: Obj[]): Obj => {
 		return new ArrayObj(args[0].elements.slice(1));
 	
 		return NULL;
-});
+};
 
-export const builtin_print = new BuiltinObj((...args: Obj[]): Obj => {
+const builtin_print = (...args: Obj[]): Obj => {
 	const strs = args.map(arg => arg.type === ObjectType.STRING_OBJ ? arg.stringify().slice(1, - 1) : arg.stringify());
 	console.log(strs.join(" "));
 	return NULL;
-});
+};
+
+export {
+	Enviroment, 
+	builtin_first,
+	builtin_last,
+	builtin_len,
+	builtin_print,
+	builtin_rest,
+}

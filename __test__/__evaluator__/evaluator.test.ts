@@ -1,4 +1,4 @@
-import { BlockStatement, Expression, ExpressionStatement, InfixExpression } from "../../src/interfaces/nodes";
+import { BlockStatement, ExpressionStatement, InfixExpression } from "../../src/interfaces/nodes";
 import { ArrayObj, FunctionObj, ObjectType } from "../../src/interfaces/object";
 import { testInfixExpression } from "../__parser__/helper";
 import { testIntegerObject, testBooleanObject, testEval, testNullObject, testErrorObj, testStringObject, testArrayObject } from "./helper";
@@ -385,6 +385,7 @@ describe("Evaluator - Test Index Expressions", () => {
 describe("Evaluator - Test Member Expressions", () => {
 	const tests = [
 		{input: "[1, 2, 3].push(4)", expected: [1, 2, 3, 4]},
+		{input: "[1, 2, 3].filter(f(x) => x % 2 == 0)", expected: [2]},
 	];
  
 	tests.forEach((test) => {
