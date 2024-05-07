@@ -230,12 +230,12 @@ export class Parser {
 	}
 
 	private parse_expr(precedence: Precedence): Expression | null {
-		const prefix = this.#prefix_fns.get(this.#current.type)!.bind(this);
+		const prefix = this.#prefix_fns.get(this.#current.type)?.bind(this);
 		if(!prefix) return null;
 
 		let left = prefix() as Expression;
 		while(!this.compare_current(TokenType.SEMICOLON) && precedence < this.precedence_peek()){
-			const infix = this.#infix_fns.get(this.#peek.type)!.bind(this);
+			const infix = this.#infix_fns.get(this.#peek.type)?.bind(this);
 			if(!infix) return left;
 			
 			this.advance();

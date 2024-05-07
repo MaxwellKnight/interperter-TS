@@ -278,7 +278,6 @@ describe("Parser - Member Expression Parsing", () => {
 
 			const expressionStatement = program.statements[0] as ExpressionStatement;
 			const expression = expressionStatement.expression as Expression;
-			console.log(expression);
 
 			// Check if the parsed expression's string representation matches the expected output
 			expect(expression.stringify()).toBe(test.expected);

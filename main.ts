@@ -5,7 +5,6 @@ import { Enviroment } from './src/enviroment';
 import fs from 'fs';
 
 const prompt = promptSync();
-
 class REPL {
   #env: Enviroment;
 
@@ -16,8 +15,10 @@ class REPL {
 	public run(): void {
 		while (true) {
 			const source = prompt('>> ');
-			if(source.trim() === "exit") return;
-			this.process(source, true);
+			if(source && source.trim() === 'exit' || source.trim() === 'quit'){
+				console.log("Exiting REPL."); return;
+			}
+			this.process(source || "", true);
 		}
 	}
 

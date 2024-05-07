@@ -12,10 +12,10 @@ export class Evaluator {
 
 	constructor() {
 		this.builtins = new Map<string, BuiltinObj>;
-		this.builtins.set("len", builtin_len);
+		this.builtins.set("len", 	builtin_len);
 		this.builtins.set("first", builtin_first);
-		this.builtins.set("last", builtin_last);
-		this.builtins.set("rest", builtin_rest);
+		this.builtins.set("last", 	builtin_last);
+		this.builtins.set("rest", 	builtin_rest);
 		this.builtins.set("print", builtin_print);
 	};
 
@@ -23,24 +23,13 @@ export class Evaluator {
    * Evaluates a given AST node, returning the appropriate object.
    */
 	public eval(node: Node | Program | null, env: Enviroment): Obj {
-		if(node instanceof IntegerLiteral){
-			return new IntegerObj(node.value);
-		}
-		else if(node instanceof StringLiteral){
-			return new StringObj(node.value);
-		}
-		else if(node instanceof BooleanExpression){
-			return node.value ? TRUE : FALSE;
-		}
-		else if(node instanceof Program){
-			return this.eval_program(node.statements, env);
-		}
-		else if(node instanceof BlockStatement){
-			return this.eval_block_statement(node, env);
-		}
-		else if(node instanceof ExpressionStatement){
-			return this.eval(node.expression, env);
-		}
+		if(     node instanceof IntegerLiteral)		return new IntegerObj(node.value);
+		else if(node instanceof StringLiteral)			return new StringObj(node.value);
+		else if(node instanceof BooleanExpression)	return node.value ? TRUE : FALSE;
+		else if(node instanceof Program)					return this.eval_program(node.statements, env);
+		else if(node instanceof BlockStatement)		return this.eval_block_statement(node, env);
+		else if(node instanceof ExpressionStatement)	return this.eval(node.expression, env);
+		else if(node instanceof MemberExpression)		return this.eval_member_expression(node, env);
 		else if(node instanceof PrefixExpression){
 			const operand = this.eval(node.right, env)
 			if(ErrorObj.isError(operand)) return operand;
@@ -106,18 +95,6 @@ export class Evaluator {
 			if(ErrorObj.isError(index)) return index;
 
 			return this.eval_index_expression(left, index);
-		}
-		else if(node instanceof MemberExpression){
-			const obj = this.eval(node.object, env);
-			if(node.property instanceof CallExpression && node.property.caller instanceof Identifier){
-				const property = obj.properties.get(node.property.caller.value);
-				if(!property) 
-					return ErrorObj.create(`Property named ${node.property.caller.value} does not exist on type:`, [obj.type]);
-				if(typeof property !== 'function') 
-					return ErrorObj.create(`${node.property.caller.value} is not a function. got:`, [property.type]);
-;
-				return property(obj, ...this.eval_expressions(node.property.arguments || [], env));
-			}
 		}
 
 		return NULL;
@@ -293,6 +270,21 @@ export class Evaluator {
 		if(idx < 0 || idx > max_idx) return NULL;
 
 		return array.elements[idx];
+	}
+
+	private eval_member_expression(node: MemberExpression, env: Enviroment): Obj {
+		const obj = this.eval(node.object, env);
+		if(ErrorObj.isError(obj)) return obj;
+		if(node.property instanceof CallExpression && node.property.caller instanceof Identifier){
+			const property = obj.properties.get(node.property.caller.value);
+			if(!property) 
+				return ErrorObj.create(`Property named "${node.property.caller.value}" does not exist on type: Array`, []);
+			if(typeof property !== 'function') 
+				return ErrorObj.create(`"${node.property.caller.value}" is not a function. got:`, [property.type]);
+;
+			return property(obj, ...this.eval_expressions(node.property.arguments || [], env));
+		}
+		return NULL;
 	}
 	
 	private unwrap_return(obj: Obj): Obj{
