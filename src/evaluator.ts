@@ -1,5 +1,5 @@
-import { Enviroment } from "./enviroment";
-import { ArrayLiteral, ArrowFunctionLiteral, BlockStatement, BooleanExpression, CallExpression, DefineStatement, Expression, ExpressionStatement, FunctionLiteral, Identifier, IfExpression, IndexExpression, InfixExpression, IntegerLiteral, Node, PrefixExpression, Program, ReturnStatement, Statement, StringLiteral } from "./interfaces/nodes";
+import { Enviroment, builtin_first, builtin_last, builtin_len, builtin_print, builtin_rest } from "./enviroment";
+import { ArrayLiteral, ArrowFunctionLiteral, BlockStatement, BooleanExpression, CallExpression, DefineStatement, Expression, ExpressionStatement, FunctionLiteral, Identifier, IfExpression, IndexExpression, InfixExpression, IntegerLiteral, MemberExpression, Node, PrefixExpression, Program, ReturnStatement, Statement, StringLiteral } from "./interfaces/nodes";
 import { ArrayObj, BooleanObj, BuiltinObj, ErrorObj, FunctionObj, IntegerObj, NullObj, Obj, ObjectType, ReturnObj, StringObj } from "./interfaces/object";
 
 
@@ -12,66 +12,11 @@ export class Evaluator {
 
 	constructor() {
 		this.builtins = new Map<string, BuiltinObj>;
-		this.builtins.set("len", new BuiltinObj((...args: Obj[]): Obj => {
-			if(args.length != 1){
-				return ErrorObj.create("Invalid argument count `len` takes 1, got:", [String(args.length)]);
-			}
-			switch(args[0].type){
-				case ObjectType.STRING_OBJ:
-					return new IntegerObj(args[0].value.toString().length);
-				case ObjectType.ARRAY_OBJ:
-					return new IntegerObj((args[0] as ArrayObj).elements.length);
-				default: 
-					return ErrorObj.create("Unsupported argument to `len`, got:", [args[0].type])
-			}
-		}));
-		this.builtins.set("first", new BuiltinObj((...args: Obj[]): Obj => {
-			if(args.length != 1){
-				return ErrorObj.create("Invalid argument count `first` takes 1, got:", [String(args.length)]);
-			}
-			if(!(args[0] instanceof ArrayObj))
-				return ErrorObj.create("`first` accepts only arrays as argument, got:", [args[0].type])
-			if(args[0].elements.length > 0)
-				return args[0].elements[0];
-			
-				return NULL;
-		}));
-		this.builtins.set("last", new BuiltinObj((...args: Obj[]): Obj => {
-			if(args.length != 1){
-				return ErrorObj.create("Invalid argument count `last` takes 1, got:", [String(args.length)]);
-			}
-			if(!(args[0] instanceof ArrayObj))
-				return ErrorObj.create("`last` accepts only arrays as argument, got:", [args[0].type])
-			if(args[0].elements.length > 0)
-				return args[0].elements[args[0].elements.length - 1];
-			
-				return NULL;
-		}));
-		this.builtins.set("rest", new BuiltinObj((...args: Obj[]): Obj => {
-			if(args.length != 1){
-				return ErrorObj.create("Invalid argument count `rest` takes 1, got:", [String(args.length)]);
-			}
-			if(!(args[0] instanceof ArrayObj))
-				return ErrorObj.create("`rest` accepts only arrays as argument, got:", [args[0].type])
-			if(args[0].elements.length > 0)
-				return new ArrayObj(args[0].elements.slice(1));
-			
-				return NULL;
-		}));
-		this.builtins.set("push", new BuiltinObj((...args: Obj[]): Obj => {
-			if(args.length != 2){
-				return ErrorObj.create("Invalid argument count `push` takes 1, got:", [String(args.length)]);
-			}
-			if(!(args[0] instanceof ArrayObj))
-				return ErrorObj.create("first argument to push must be of type `array` got:", [args[0].type])
-			
-			return new ArrayObj([...args[0].elements, args[1]]);
-		}));
-		this.builtins.set("print", new BuiltinObj((...args: Obj[]): Obj => {
-			const strs = args.map(arg => arg.type === ObjectType.STRING_OBJ ? arg.stringify().slice(1, - 1) : arg.stringify());
-			console.log(strs.join(" "));
-			return NULL;
-		}));
+		this.builtins.set("len", builtin_len);
+		this.builtins.set("first", builtin_first);
+		this.builtins.set("last", builtin_last);
+		this.builtins.set("rest", builtin_rest);
+		this.builtins.set("print", builtin_print);
 	};
 
 	/**
@@ -161,6 +106,18 @@ export class Evaluator {
 			if(ErrorObj.isError(index)) return index;
 
 			return this.eval_index_expression(left, index);
+		}
+		else if(node instanceof MemberExpression){
+			const obj = this.eval(node.object, env);
+			if(node.property instanceof CallExpression && node.property.caller instanceof Identifier){
+				const property = obj.properties.get(node.property.caller.value);
+				if(!property) 
+					return ErrorObj.create(`Property named ${node.property.caller.value} does not exist on type:`, [obj.type]);
+				if(typeof property !== 'function') 
+					return ErrorObj.create(`${node.property.caller.value} is not a function. got:`, [property.type]);
+;
+				return property(obj, ...this.eval_expressions(node.property.arguments || [], env));
+			}
 		}
 
 		return NULL;

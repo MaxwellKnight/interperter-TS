@@ -2,7 +2,7 @@ map = f(arr, fn) {
 	iter = f(arr, acc) {
 		if(len(arr) == 0)  return acc;
 
-		return iter(rest(arr), push(acc, fn(first(arr))));
+		return iter(rest(arr), acc.push(fn(first(arr))));
 	}
 	return iter(arr, []);
 }
@@ -11,7 +11,7 @@ filter = f(arr, fn) {
 	iter = f(arr, acc) {
 		if(len(arr) == 0)  return acc;
 		if(fn(first(arr))) 
-			return iter(rest(arr), push(acc, first(arr)));
+			return iter(rest(arr), acc.push(first(arr)));
 
 		return iter(rest(arr), acc);
 	}
@@ -32,7 +32,7 @@ reduce = f(arr, fn, init) {
 concat = f(arr1, arr2) {
 	iter = f(result, arr) {
 		if (len(arr) == 0) return result;
-		return iter(push(result, first(arr)), rest(arr));
+		return iter(result.push(first(arr)), rest(arr));
 	}
 	return iter(arr1, arr2);
 }
@@ -41,7 +41,7 @@ zip = f(arr1, arr2) {
 	iter = f(result, a1, a2) {
 		if (len(a1) == 0) return result;
 		if (len(a2) == 0) return result;
-		return iter(push(result, [first(a1), first(a2)]), rest(a1), rest(a2));
+		return iter(result.push([first(a1), first(a2)]), rest(a1), rest(a2));
 	}
 	return iter([], arr1, arr2);
 }
@@ -49,12 +49,12 @@ zip = f(arr1, arr2) {
 take = f(n, arr) {
 	if(n <= 0) return [] 
 	if(len(arr) == 0) return [];
-	return push(take(n - 1, rest(arr)), first(arr));
+	return take(n - 1, rest(arr)).push(first(arr));
 }
 
 drop = f(n, arr) {
 	if(len(arr) == 0) return [];
-	if(n <= 0) return push(drop(n, rest(arr)), first(arr));
+	if(n <= 0) return drop(n, rest(arr)).push(first(arr));
 	return drop(n - 1, rest(arr));
 }
 

@@ -86,7 +86,7 @@ export class ArrayObj extends Obj {
 	constructor(elements: Obj[]){
 		super(ObjectType.ARRAY_OBJ);
 		this.elements = elements;
-		this.properties.set('push', ArrayObj.push.bind(this));
+		this.properties.set('push', ArrayObj.push);
 	}
 
 	public stringify(): string { 
@@ -130,7 +130,7 @@ export class BuiltinObj extends Obj {
 		this.fn = fn;
 	}
 
-	public stringify(): string { return "builtin function"; }
+	public stringify(): string { return `builtin function ${this.type}`; }
 }
 
 export class ErrorObj extends Obj {
