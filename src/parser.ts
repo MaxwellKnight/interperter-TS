@@ -25,6 +25,7 @@ import { Lexer } from "./lexer";
 
 enum Precedence {
 	LOWEST,
+	LOGICAL,
 	EQAULS,
 	LESSGREATER,
 	SUM,
@@ -38,6 +39,9 @@ enum Precedence {
 
 
 const PRECEDENCES = new Map<TokenType, Precedence>();
+PRECEDENCES.set(TokenType.AND, Precedence.LOGICAL);
+PRECEDENCES.set(TokenType.OR, Precedence.LOGICAL);
+PRECEDENCES.set(TokenType.NOT, Precedence.PREFIX);
 PRECEDENCES.set(TokenType.EQUALS, Precedence.EQAULS);
 PRECEDENCES.set(TokenType.NOT_EQUALS, Precedence.EQAULS);
 PRECEDENCES.set(TokenType.LT, Precedence.LESSGREATER);
@@ -80,6 +84,7 @@ export class Parser {
 		this.register_prefix(TokenType.STRING, this.parse_string);
 		this.register_prefix(TokenType.LBRACKET, this.parse_array_literal);
 		this.register_prefix(TokenType.BANG, this.parse_prefix_expr);
+		this.register_prefix(TokenType.NOT, this.parse_prefix_expr);
 		this.register_prefix(TokenType.MINUS, this.parse_prefix_expr);
 
 		this.register_prefix(TokenType.FUNCTION, this.parse_function_literal);
@@ -96,6 +101,8 @@ export class Parser {
 		this.register_infix(TokenType.DOT, this.parse_member_expr);
 
 		this.register_infix(TokenType.PLUS, this.parse_infix_expr);
+		this.register_infix(TokenType.AND, this.parse_infix_expr);
+		this.register_infix(TokenType.OR, this.parse_infix_expr);
 		this.register_infix(TokenType.MINUS, this.parse_infix_expr);
 		this.register_infix(TokenType.SLASH, this.parse_infix_expr);
 		this.register_infix(TokenType.ASTERISK, this.parse_infix_expr);

@@ -163,7 +163,7 @@ export class PrefixExpression extends Expression {
 		this.right = null;
 	}
 
-	public stringify(): string { return this.right ? `(${this.operator}${this.right.stringify()})` : ""; }
+	public stringify(): string { return this.right ? `(${this.operator}${this.operator === 'not' ? ' ': ''}${this.right.stringify()})` : ""; }
 }
 
 /**

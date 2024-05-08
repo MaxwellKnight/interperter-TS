@@ -109,6 +109,9 @@ describe('Lexer', () => {
 		"		\n		"
 		"		\t\r\n		"
 		[foo, 6]
+		and
+		or
+		not
 		`)
 
 		const expectedTokens = [
@@ -203,6 +206,9 @@ describe('Lexer', () => {
 			new Token(TokenType.COMMA, ','),
 			new Token(TokenType.INT, '6'),
 			new Token(TokenType.RBRACKET, ']'),
+			new Token(TokenType.AND, 'and'),
+			new Token(TokenType.OR, 'or'),
+			new Token(TokenType.NOT, 'not'),
 	  
 			new Token(TokenType.EOF, '\0'), // End of file
 	  ];

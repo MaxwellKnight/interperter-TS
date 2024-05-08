@@ -395,3 +395,19 @@ describe("Evaluator - Test Member Expressions", () => {
 		});
 	});
 });
+
+
+describe("Evaluator - Test Logical Expressions", () => {
+	const tests = [
+		{ input: "not true and false", expected: false},
+		{ input: "true and true == true and not false", expected: true},
+		{ input: "5*3 == 15 and 10 + 5 == 15", expected: true},
+	];
+ 
+	tests.forEach((test) => {
+		it(`should evaluate '${test.input}' to ${test.expected}`, () => {
+			const evaluated = testEval(test.input); 
+			expect(testBooleanObject(evaluated, test.expected)).toBe(true);
+		});
+	});
+});

@@ -133,6 +133,7 @@ class Evaluator {
 		switch(operator){
 			case "!": 	return this.eval_bang_prefix(operand);
 			case "-": 	return this.eval_minus_prefix(operand);
+			case "not": return this.is_truthy(operand) ? FALSE : TRUE
 			default: 	return ErrorObj.create("Unknown operator:", [operator + operand.type]);
 		}
 	}
@@ -174,6 +175,12 @@ class Evaluator {
 		
 		else if(operator == "!=")
 			return left.value != right.value ? TRUE : FALSE;
+
+		else if(operator == 'and')
+			return this.is_truthy(left) && this.is_truthy(right) ? TRUE : FALSE;
+	
+		else if(operator == 'or')
+			return this.is_truthy(left) || this.is_truthy(right) ? TRUE : FALSE;
 		
 		return ErrorObj.create("Unknown operator:", [left.type, operator, right.type]);
 	}

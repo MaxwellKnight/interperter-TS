@@ -196,6 +196,7 @@ describe("Parser - Infix Expression Parsing", () => {
 		});
 	});
  });
+
 describe("Parser - Infix Expression Parsing", () => {
 	const tests = [
 		{ input: "-a * b", expected: "((-a) * b)" },
@@ -206,8 +207,11 @@ describe("Parser - Infix Expression Parsing", () => {
 		{ input: "70 > 12 == true", expected: "((70 > 12) == true)" },
 		{ input: "true == false", expected: "(true == false)"},
 		{ input: "true != false", expected: "(true != false)"},
-		{ input: "false == false", expected: "(false == false)"}
-
+		{ input: "false == false", expected: "(false == false)"},
+		{ input: "true and false", expected: "(true and false)"},
+		{ input: "not true and false", expected: "((not true) and false)"},
+		{ input: "true and true == true and not false", expected: "((true and (true == true)) and (not false))"},
+		{ input: "5*3 == 15 and 10 + 5 == 15", expected: "(((5 * 3) == 15) and ((10 + 5) == 15))"},
 	];
  
 	tests.forEach((test) => {
@@ -259,7 +263,7 @@ describe("Parser - Member Expression Parsing", () => {
 	const tests = [
 		{ input: "max.the.king[0]", expected: "(((max.the).king)[0])" },
 		{ input: "max.the.king()[0]", expected: "(((max.the).king())[0])" },
-		{ input: "5 * 2 + or.yona", expected: "((5 * 2) + (or.yona))" },
+		{ input: "5 * 2 + orr.yona", expected: "((5 * 2) + (orr.yona))" },
 		{ input: "5 / dor.shamen", expected: "(5 / (dor.shamen))" },
 		{ input: `lior.the.shamen["duby"]`, expected: `(((lior.the).shamen)["duby"])` },
 		{ input: `[1, 2, 3].sort()`, expected: `(([1, 2, 3]).sort())` },

@@ -6,6 +6,9 @@ const KEYWORDS: { [key: string]: TokenType } = {
 	"def": TokenType.DEFINE,
 	"true": TokenType.TRUE,
 	"false": TokenType.FALSE,
+	"and": TokenType.AND,
+	"or": TokenType.OR,
+	"not": TokenType.NOT,
 	"if": TokenType.IF,
 	"else": TokenType.ELSE,
 	"return": TokenType.RETURN
