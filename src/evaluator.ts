@@ -2,6 +2,8 @@ import { Enviroment, builtin_first, builtin_last, builtin_len, builtin_print, bu
 import { ArrayLiteral, ArrowFunctionLiteral, BlockStatement, BooleanExpression, CallExpression, DefineStatement, Expression, ExpressionStatement, FunctionLiteral, Identifier, IfExpression, IndexExpression, InfixExpression, IntegerLiteral, MemberExpression, Node, PrefixExpression, Program, ReturnStatement, Statement, StringLiteral } from "./interfaces/nodes";
 import { ArrayObj, BooleanObj, BuiltinObj, ErrorObj, FALSE, FunctionObj, IntegerObj, NULL, NullObj, Obj, ObjectType, ReturnObj, StringObj, TRUE } from "./interfaces/object";
 
+export const envs: Enviroment[] = [];
+
 class Evaluator {
 	builtins: Map<string, BuiltinObj | NullObj>;
 
@@ -19,6 +21,8 @@ class Evaluator {
    * Evaluates a given AST node, returning the appropriate object.
    */
 	public eval(node: Node | Program | null, env: Enviroment): Obj {
+		if(envs.length === 0) envs.push(env);
+
 		if(     node instanceof IntegerLiteral)		return new IntegerObj(node.value);
 		else if(node instanceof StringLiteral)			return new StringObj(node.value);
 		else if(node instanceof BooleanExpression)	return node.value ? TRUE : FALSE;
@@ -204,7 +208,7 @@ class Evaluator {
 		if(this.is_truthy(condition) && if_expr.if_case){
 			return this.eval(if_expr.if_case, env);
 		}
-		else if(if_expr.else_case !== null && if_expr.else_case) 
+		else if(if_expr.else_case) 
 			return this.eval(if_expr.else_case, env);
 
 		return NULL;
@@ -234,6 +238,7 @@ class Evaluator {
 	public apply_function(fn: Obj, args: Obj[]): Obj{
 		if(fn instanceof FunctionObj){
 			const extendedEnv = this.extend_function_env(fn, args);
+			envs.push(extendedEnv);
 			const result = this.eval(fn.body, extendedEnv);
 			return this.unwrap_return(result);
 		}
@@ -255,7 +260,7 @@ class Evaluator {
 		if(left.type === ObjectType.ARRAY_OBJ && index.type === ObjectType.INTEGER_OBJ)
 			return this.eval_array_index_expression(left, index);
 		
-		return ErrorObj.create("index operator not supported on type:", [left.type]);
+		return ErrorObj.create(`index operator of type "${index.type}" not supported on type:`, [`"${left.type}"`]);
 	}
 
 	private eval_array_index_expression(left: Obj, index: Obj): Obj{
@@ -274,11 +279,18 @@ class Evaluator {
 		if(node.property instanceof CallExpression && node.property.caller instanceof Identifier){
 			const property = obj.properties.get(node.property.caller.value);
 			if(!property) 
-				return ErrorObj.create(`Property named "${node.property.caller.value}" does not exist on type: Array`, []);
-			if(typeof property !== 'function') 
-				return ErrorObj.create(`"${node.property.caller.value}" is not a function. got:`, [property.toString()]);
+				return ErrorObj.create(`Property named "${node.property.caller.value}" does not exist on type: ${obj.type}`, []);
+			if(property instanceof Obj) 
+				return ErrorObj.create(`"${node.property.caller.value}" is not a function. got:`, [property.type]);
 ;
 			return property(obj, ...this.eval_expressions(node.property.arguments || [], env));
+		}
+		else if(node.property instanceof Identifier){
+			const property = obj.properties.get(node.property.value) as Obj;
+			if(!property) 
+				return ErrorObj.create(`Property named "${node.property.value}" does not exist on type: ${obj.type}`, []);
+			
+			return property;
 		}
 		return NULL;
 	}
@@ -301,6 +313,7 @@ class Evaluator {
 		return true;
 	}
 }
+
 
 export {
 	Evaluator, 

@@ -47,6 +47,7 @@ export class StringObj extends Obj {
 	constructor(value: string){
 		super(ObjectType.STRING_OBJ);
 		this.value = value;
+		this.properties.set("length", new IntegerObj(value.length));
 	}
 	
 	public stringify(): string { return `"${this.value}"`; }
@@ -90,6 +91,7 @@ export class ArrayObj extends Obj {
 		this.properties.set('filter', ArrayObj.filter);
 		this.properties.set('map', ArrayObj.map);
 		this.properties.set('reduce', ArrayObj.reduce);
+		this.properties.set('length', new IntegerObj(elements.length));
 	}
 
 	public stringify(): string { 
@@ -189,7 +191,8 @@ export class FunctionObj extends Obj {
 	}
 
 	public stringify(): string {
-		return `f(${this.parameters?.map((param) => param.stringify())} {\n ${this.body?.stringify()} \n})`
+		const body = this.body instanceof Expression ? `=> ${this.body.stringify()}` : `{\n  ${this.body?.stringify()} \n}` 
+		return `f(${this.parameters?.map((param) => param.stringify())}) ${body} `
 	}
 }
 
@@ -220,7 +223,7 @@ export class ErrorObj extends Obj {
 		return obj.type === ObjectType.ERROR_OBJ;
 	}
 
-	public stringify(): string { return `ERROR: ${this.value}`; }
+	public stringify(): string { return `RuntimeError: ${this.value}`; }
 }
 
 export const TRUE = new BooleanObj(true);

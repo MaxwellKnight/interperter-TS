@@ -17,6 +17,14 @@ class Enviroment {
 		return obj;
 	}
 
+	public getEnv(): Map<string, Obj>{
+		return this.#env;
+	}
+
+	public getParent(): Enviroment | null{
+		return this.#parent;
+	}
+
 	public set(key: string, obj: Obj): Obj {
 		this.#env.set(key, obj);
 		return obj;

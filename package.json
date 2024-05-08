@@ -17,6 +17,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
+    "@hpcc-js/wasm": "^2.16.2",
     "fs": "^0.0.1-security",
     "prompt-sync": "^4.2.0"
   }

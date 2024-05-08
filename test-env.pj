@@ -1,0 +1,1 @@
+result = (f(fn, n) => fn(n))(f(x) => x*x, 4)
