@@ -212,6 +212,7 @@ describe("Parser - Infix Expression Parsing", () => {
 		{ input: "not true and false", expected: "((not true) and false)"},
 		{ input: "true and true == true and not false", expected: "((true and (true == true)) and (not false))"},
 		{ input: "5*3 == 15 and 10 + 5 == 15", expected: "(((5 * 3) == 15) and ((10 + 5) == 15))"},
+		{ input: "not (5 > 1)", expected: "(not (5 > 1))"},
 	];
  
 	tests.forEach((test) => {

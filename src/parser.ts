@@ -41,7 +41,7 @@ enum Precedence {
 const PRECEDENCES = new Map<TokenType, Precedence>();
 PRECEDENCES.set(TokenType.AND, Precedence.LOGICAL);
 PRECEDENCES.set(TokenType.OR, Precedence.LOGICAL);
-PRECEDENCES.set(TokenType.NOT, Precedence.LOGICAL);
+PRECEDENCES.set(TokenType.NOT, Precedence.LOGICAL);	
 PRECEDENCES.set(TokenType.EQUALS, Precedence.EQAULS);
 PRECEDENCES.set(TokenType.NOT_EQUALS, Precedence.EQAULS);
 PRECEDENCES.set(TokenType.LT, Precedence.LESSGREATER);
