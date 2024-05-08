@@ -64,9 +64,6 @@ create_rlist = f(rlist) {
 
 foo = 6;
 nums = [1,2,3,4, 4 + 1, foo];
-strs = ["1", "2", "3", "4", "5", "6", (f() => "7")()];
 
 print("nums    :", nums);
-print("strs    :", strs);
-print("zip     :", zip(nums, strs));
 print("Rlist   :", create_rlist([1,2,3,4]))

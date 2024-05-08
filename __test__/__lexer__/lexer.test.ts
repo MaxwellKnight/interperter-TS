@@ -3,7 +3,7 @@ import { Lexer } from "../../src/lexer";
 
 describe('Lexer', () => {
 	it('should tokenize basic symbols and operators', () => {
-		const lexer = new Lexer("=+(){**},-/*%.");
+		const lexer = new Lexer("=+(){**},-/*%.:");
 		const expectedTokens = [
 			new Token(TokenType.ASSIGN, "="),  
 			new Token(TokenType.PLUS, "+"),    
@@ -18,6 +18,7 @@ describe('Lexer', () => {
 			new Token(TokenType.ASTERISK, "*"),     
 			new Token(TokenType.PERCENT, "%"),     
 			new Token(TokenType.DOT, "."),     
+			new Token(TokenType.COLON, ":"),     
 			new Token(TokenType.EOF, "\0"),    
 	  ];
 

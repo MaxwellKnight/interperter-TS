@@ -38,6 +38,7 @@ export enum TokenType {
 	ELSE = "else",
 	RETURN = "return",
 	DOT = "dot",
+	COLON = "colon",
 	BANG = "bang" // `!` symbol
 }
 

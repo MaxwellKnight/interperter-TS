@@ -1,6 +1,6 @@
 import { Enviroment, builtin_first, builtin_last, builtin_len, builtin_print, builtin_rest } from "./enviroment";
-import { ArrayLiteral, ArrowFunctionLiteral, BlockStatement, BooleanExpression, CallExpression, DefineStatement, Expression, ExpressionStatement, FunctionLiteral, Identifier, IfExpression, IndexExpression, InfixExpression, IntegerLiteral, MemberExpression, Node, PrefixExpression, Program, ReturnStatement, Statement, StringLiteral } from "./interfaces/nodes";
-import { ArrayObj, BooleanObj, BuiltinObj, ErrorObj, FALSE, FunctionObj, IntegerObj, NULL, NullObj, Obj, ObjectType, ReturnObj, StringObj, TRUE } from "./interfaces/object";
+import { ArrayLiteral, ArrowFunctionLiteral, BlockStatement, BooleanExpression, CallExpression, DefineStatement, Expression, ExpressionStatement, FunctionLiteral, Identifier, IfExpression, IndexExpression, InfixExpression, IntegerLiteral, MemberExpression, Node, ObjectLiteral, PrefixExpression, Program, ReturnStatement, Statement, StringLiteral } from "./interfaces/nodes";
+import { ArrayObj, BooleanObj, BuiltinObj, ErrorObj, FALSE, FunctionObj, IntegerObj, NULL, NullObj, Obj, ObjectObj, ObjectType, ReturnObj, StringObj, TRUE } from "./interfaces/object";
 
 export const envs: Enviroment[] = [];
 
@@ -97,6 +97,29 @@ class Evaluator {
 
 			return this.eval_index_expression(left, index);
 		}
+		else if(node instanceof ObjectLiteral){
+			const obj = new ObjectObj(ObjectType.OBJECT_OBJ);
+			node.properties.forEach((v, k, map) => {	
+				const value = this.eval(v, env);
+				if(ErrorObj.isError(value)) return value;
+				
+				let key: Obj;
+				if(k instanceof Identifier){
+					if(map.get(k) === null){
+						const val = this.eval(k, env);
+						if(ErrorObj.isError(val)) return val;
+						obj.properties.set(k.value, val);
+					}
+					else obj.properties.set(k.value, value);
+				}
+				else{
+					key = this.eval(k, env);
+					if(ErrorObj.isError(key)) return key;
+					obj.properties.set(key.value, value);
+				}
+			});
+			return obj;
+		}
 
 		return NULL;
 	}
@@ -170,16 +193,16 @@ class Evaluator {
 		else if((left instanceof StringObj) && (right instanceof StringObj))
 			return this.eval_string_infix_expression(operator, left, right);
 
-		else if(operator == "==")
-			return left.value == right.value ? TRUE : FALSE;
+		else if(operator === "==")
+			return left.value === right.value ? TRUE : FALSE;
 		
-		else if(operator == "!=")
-			return left.value != right.value ? TRUE : FALSE;
+		else if(operator === "!=")
+			return left.value !== right.value ? TRUE : FALSE;
 
-		else if(operator == 'and')
+		else if(operator === 'and')
 			return this.is_truthy(left) && this.is_truthy(right) ? TRUE : FALSE;
 	
-		else if(operator == 'or')
+		else if(operator === 'or')
 			return this.is_truthy(left) || this.is_truthy(right) ? TRUE : FALSE;
 		
 		return ErrorObj.create("Unknown operator:", [left.type, operator, right.type]);
@@ -205,6 +228,7 @@ class Evaluator {
 	private eval_string_infix_expression(operator: string, left: StringObj, right: StringObj): Obj  {
 		switch(operator){
 			case "+":	return new StringObj(left.value + right.value);
+			case "==":	return new BooleanObj(left.value === right.value);
 			default:	 	return ErrorObj.create("Unknown operator:", [left.type, operator, right.type]);
 		}
 	}

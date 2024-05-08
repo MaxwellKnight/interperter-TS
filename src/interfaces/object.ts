@@ -9,6 +9,7 @@ export enum ObjectType {
 	RETURN_OBJ = "return",
 	FUNCTION_OBJ = "function",
 	ARRAY_OBJ = "array",
+	OBJECT_OBJ = "object",
 	BUILTIN_OBJ = "builtin",
 	ERROR_OBJ = "error",
 	NULL_OBJ = "null"
@@ -32,6 +33,22 @@ export abstract class Obj {
 	public abstract stringify(): string;
 }
 
+export class ObjectObj extends Obj{
+	constructor(type: ObjectType){
+		super(type);
+	}
+
+	public stringify(level = 0): string {
+		const properties: string[][] = [];
+		this.properties.forEach((value, key) => {
+			if(typeof value === 'function')
+				properties.push([`<function ${key}>`, key.toString()]);
+			if(value instanceof Obj) properties.push([value.stringify(), key.toString()]);
+		})
+		return `{ ${properties.map(elem => `${elem[1]}${': ' + (elem[0] ? elem[0] : 'null')}`).join(", ")} }`;
+	}
+}
+
 export class IntegerObj extends Obj {
 	value: number;
 	constructor(value: number){
@@ -50,7 +67,7 @@ export class StringObj extends Obj {
 		this.properties.set("length", new IntegerObj(value.length));
 	}
 	
-	public stringify(): string { return `"${this.value}"`; }
+	public stringify(level = 0): string { return `"${this.value}"`; }
 }
 
 export class BooleanObj extends Obj {
@@ -60,7 +77,7 @@ export class BooleanObj extends Obj {
 		this.value = value;
 	}
 	
-	public stringify(): string { return `${this.value}`; }
+	public stringify(level = 0): string { return `${this.value}`; }
 }
 
 export class ReturnObj extends Obj {
@@ -70,7 +87,7 @@ export class ReturnObj extends Obj {
 		this.value = value;
 	}
 
-	public stringify(): string { return this.value.stringify(); }
+	public stringify(level = 0): string { return this.value.stringify(); }
 }
 
 export class NullObj extends Obj {
@@ -94,7 +111,7 @@ export class ArrayObj extends Obj {
 		this.properties.set('length', new IntegerObj(elements.length));
 	}
 
-	public stringify(): string { 
+	public stringify(level = 0): string { 
 		return `[${this.elements.map(obj => obj.stringify()).join(", ")}]`; 
 	};
 
@@ -190,8 +207,8 @@ export class FunctionObj extends Obj {
 		this.env = null;
 	}
 
-	public stringify(): string {
-		const body = this.body instanceof Expression ? `=> ${this.body.stringify()}` : `{\n  ${this.body?.stringify()} \n}` 
+	public stringify(level = 0): string {
+		const body = this.body instanceof Expression ? `=> ${this.body.stringify()}` : `{\n${this.body?.stringify()} \n}` 
 		return `f(${this.parameters?.map((param) => param.stringify())}) ${body} `
 	}
 }
@@ -204,7 +221,7 @@ export class BuiltinObj extends Obj {
 		this.fn = fn;
 	}
 
-	public stringify(): string { return `builtin function ${this.type}`; }
+	public stringify(level = 0): string { return `builtin function ${this.type}`; }
 }
 
 export class ErrorObj extends Obj {
@@ -223,7 +240,7 @@ export class ErrorObj extends Obj {
 		return obj.type === ObjectType.ERROR_OBJ;
 	}
 
-	public stringify(): string { return `RuntimeError: ${this.value}`; }
+	public stringify(level = 0): string { return `RuntimeError: ${this.value}`; }
 }
 
 export const TRUE = new BooleanObj(true);

@@ -14,6 +14,7 @@ import {
 	InfixExpression, 
 	IntegerLiteral, 
 	MemberExpression, 
+	ObjectLiteral, 
 	PrefixExpression, 
 	Program, 
 	ReturnStatement, 
@@ -33,15 +34,13 @@ enum Precedence {
 	PREFIX,
 	POWER,
 	INDEX,
-	MEMBER,
 	CALL,
+	MEMBER,
 };
-
-
+// { key, } | { key } | { key1: value1, key2: value2, ...}
 const PRECEDENCES = new Map<TokenType, Precedence>();
 PRECEDENCES.set(TokenType.AND, Precedence.LOGICAL);
-PRECEDENCES.set(TokenType.OR, Precedence.LOGICAL);
-PRECEDENCES.set(TokenType.NOT, Precedence.LOGICAL);	
+PRECEDENCES.set(TokenType.OR, Precedence.LOGICAL);	
 PRECEDENCES.set(TokenType.EQUALS, Precedence.EQAULS);
 PRECEDENCES.set(TokenType.NOT_EQUALS, Precedence.EQAULS);
 PRECEDENCES.set(TokenType.LT, Precedence.LESSGREATER);
@@ -86,20 +85,16 @@ export class Parser {
 		this.register_prefix(TokenType.BANG, this.parse_prefix_expr);
 		this.register_prefix(TokenType.NOT, this.parse_prefix_expr);
 		this.register_prefix(TokenType.MINUS, this.parse_prefix_expr);
-
 		this.register_prefix(TokenType.FUNCTION, this.parse_function_literal);
-
 		this.register_prefix(TokenType.IF, this.parse_if_expr);
-
 		this.register_prefix(TokenType.LPAREN, this.parse_grouped_expr);
-
 		this.register_prefix(TokenType.TRUE, this.parse_boolean);
 		this.register_prefix(TokenType.FALSE, this.parse_boolean);
-
+		this.register_prefix(TokenType.LBRACE, this.parse_object_literal_expr);
+		
 		this.register_infix(TokenType.LBRACKET, this.parse_index_expr);
 		this.register_infix(TokenType.LPAREN, this.parse_call_expr);
 		this.register_infix(TokenType.DOT, this.parse_member_expr);
-
 		this.register_infix(TokenType.PLUS, this.parse_infix_expr);
 		this.register_infix(TokenType.AND, this.parse_infix_expr);
 		this.register_infix(TokenType.OR, this.parse_infix_expr);
@@ -448,5 +443,41 @@ export class Parser {
 
 		memeber.property = this.parse_expr(Precedence.MEMBER);
 		return memeber;
+	}
+
+	private parse_object_literal_expr(): Expression | null {
+		const obj = new ObjectLiteral(this.#current);
+		this.advance();
+		
+		if(this.compare_current(TokenType.RBRACE)) return obj;
+		
+		while(!this.compare_current(TokenType.EOF) && !this.compare_current(TokenType.RBRACE)){
+			const key = this.parse_expr(Precedence.LOWEST);
+			if(!key) return null;
+			this.advance();
+			
+			if(this.compare_current(TokenType.COMMA)){
+				this.advance();
+				obj.properties.set(key, null)
+				continue;
+			}
+			else if(this.compare_current(TokenType.COLON)){
+				this.advance();
+
+				const value = this.parse_expr(Precedence.LOWEST);
+				if(!value) return null;
+				obj.properties.set(key, value);
+				this.advance();
+				if(this.compare_current(TokenType.COMMA)){
+					this.advance();
+				}
+			}
+
+		}
+		if(!this.compare_current(TokenType.RBRACE)) {
+			this.peekError(TokenType.RBRACE)
+			return null;
+		}
+		return obj;
 	}
 }

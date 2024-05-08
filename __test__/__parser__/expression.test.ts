@@ -263,12 +263,12 @@ describe("Parser - Infix Grouped Expression Parsing", () => {
 describe("Parser - Member Expression Parsing", () => {
 	const tests = [
 		{ input: "max.the.king[0]", expected: "(((max.the).king)[0])" },
-		{ input: "max.the.king()[0]", expected: "(((max.the).king())[0])" },
+		{ input: "max.the.king()[0]", expected: "(((max.the).king)()[0])" },
 		{ input: "5 * 2 + orr.yona", expected: "((5 * 2) + (orr.yona))" },
 		{ input: "5 / dor.shamen", expected: "(5 / (dor.shamen))" },
 		{ input: `lior.the.shamen["duby"]`, expected: `(((lior.the).shamen)["duby"])` },
-		{ input: `[1, 2, 3].sort()`, expected: `(([1, 2, 3]).sort())` },
-		{ input: `[1, 2, 3].sort().map(x, y)`, expected: `((([1, 2, 3]).sort()).map(x, y))` },
+		{ input: `[1, 2, 3].sort()`, expected: `(([1, 2, 3]).sort)()` },
+		{ input: `[1, 2, 3].sort().map(x, y)`, expected: `((([1, 2, 3]).sort)().map)(x, y)` },
 	];
  
 	tests.forEach((test) => {

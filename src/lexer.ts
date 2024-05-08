@@ -61,6 +61,7 @@ export class Lexer {
 			case "[": 	token = new Token(TokenType.LBRACKET, this.#character); 	break;
 			case "]": 	token = new Token(TokenType.RBRACKET, this.#character); 	break;
 			case ",": 	token = new Token(TokenType.COMMA, this.#character);		break;
+			case ":": 	token = new Token(TokenType.COLON, this.#character);		break;
 			case ".": 	token = new Token(TokenType.DOT, this.#character);			break;
 			case "+": 	token = new Token(TokenType.PLUS, this.#character);		break;
 			case "-": 	token = new Token(TokenType.MINUS, this.#character);		break;

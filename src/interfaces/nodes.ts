@@ -323,3 +323,22 @@ export class IndexExpression extends Expression {
 
 	public stringify(): string { return `(${this.left.stringify()}[${this.index?.stringify()}])`; }
 }
+
+export class ObjectLiteral extends Expression {
+
+	properties: Map<Expression, Expression | null>
+	constructor(token: Token){
+		super(token);
+		this.properties = new Map<Expression, Expression | null>;
+	}
+
+	public stringify(): string {
+		const properties: string[][] = [];
+		this.properties.forEach((value, key) => {
+			if(typeof value === 'function')
+				properties.push([`<function ${key.stringify()}>`, key.stringify()]);
+			properties.push([value ? value.stringify() : "", key.stringify()]);
+		})
+		return `{ ${properties.map(elem => `${elem[1]}${': ' + (elem[0] ? elem[0] : 'null')}`).join(", ")} }`;
+	}
+}

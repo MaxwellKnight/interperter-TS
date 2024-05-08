@@ -1,1 +1,12 @@
-result = (f(fn, n) => fn(n))(f(x) => x*x, 4)
+right = 20;
+obj = {
+	left: 0,
+	right: 1,
+	complex: {
+		left: 10,
+		right,
+	},
+	func: f(x) => x ** 2,
+}
+
+print(obj.right + obj.complex.left)
