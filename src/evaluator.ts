@@ -72,12 +72,13 @@ class Evaluator {
 			return fn;
 		}
 		else if(node instanceof CallExpression){
-			const fn = this.eval(node.caller, env);
-			if(ErrorObj.isError(fn)) return fn;
-
 			const args = this.eval_expressions(node.arguments || [], env);
 			if(args.length == 1 && ErrorObj.isError(args[0]))
-				return args[0];
+			return args[0];
+			
+			const fn = this.eval(node.caller, env);
+			if(ErrorObj.isError(fn)) return fn;
+			
 			return this.apply_function(fn, args);
 		}
 		else if(node instanceof ArrayLiteral) {
