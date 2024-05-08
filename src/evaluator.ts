@@ -20,7 +20,7 @@ class Evaluator {
 	/**
    * Evaluates a given AST node, returning the appropriate object.
    */
-	public eval(node: Node | Program | null, env: Enviroment): Obj {
+	public eval(node: Node | null, env: Enviroment): Obj {
 		if(envs.length === 0) envs.push(env);
 
 		if(     node instanceof IntegerLiteral)		return new IntegerObj(node.value);
@@ -78,7 +78,7 @@ class Evaluator {
 			
 			const fn = this.eval(node.caller, env);
 			if(ErrorObj.isError(fn)) return fn;
-			
+
 			return this.apply_function(fn, args);
 		}
 		else if(node instanceof ArrayLiteral) {
