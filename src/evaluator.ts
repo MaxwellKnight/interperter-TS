@@ -5,7 +5,7 @@ import { ArrayObj, BooleanObj, BuiltinObj, ErrorObj, FALSE, FunctionObj, Integer
 export const envs: Enviroment[] = [];
 
 class Evaluator {
-	builtins: Map<string, BuiltinObj | NullObj>;
+	builtins: Map<string, Obj>;
 
 	constructor() {
 		this.builtins = new Map<string, BuiltinObj | NullObj>;
