@@ -110,6 +110,7 @@ export class ArrayObj extends Obj {
 		this.properties.set('filter', ArrayObj.filter);
 		this.properties.set('map', ArrayObj.map);
 		this.properties.set('reduce', ArrayObj.reduce);
+		this.properties.set('slice', ArrayObj.slice);
 		this.properties.set('length', new IntegerObj(elements.length));
 	}
 
@@ -195,6 +196,43 @@ export class ArrayObj extends Obj {
   
 		return accumulator;
 	}
+
+	static slice(self: Obj, ...args: Obj[]): Obj {
+		if (!(self instanceof ArrayObj)) {
+			return ErrorObj.create("First argument to `slice` must be of type `array`, got:", [self.type]);
+		}
+
+		let start = 0;
+		let end = self.elements.length;
+
+		if (args.length === 0) return new ArrayObj([...self.elements]);
+
+		if (args.length > 0) {
+			const startArg = args[0];
+			if (startArg instanceof IntegerObj) start = startArg.value;
+			else return ErrorObj.create("`slice` expects integer arguments for start.", []);
+		}
+
+		if (args.length > 1) {
+			const endArg = args[1];
+			if (endArg instanceof IntegerObj) end = endArg.value;
+			else return ErrorObj.create("`slice` expects integer arguments for end.", []);
+		}
+
+		// Handle negative indices
+		if (start < 0) start = Math.max(0, self.elements.length + start);
+		if (end < 0) end = Math.max(0, self.elements.length + end);
+
+		// Ensure start and end are within bounds
+		start = Math.min(self.elements.length, start);
+		end = Math.min(self.elements.length, end);
+		
+		if (start >= end) return new ArrayObj([]);
+
+		const slicedElements = self.elements.slice(start, end);
+		return new ArrayObj(slicedElements);
+	}
+
 }
 
 export class FunctionObj extends Obj {

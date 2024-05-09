@@ -312,7 +312,10 @@ class Evaluator {
 			const property = obj.properties.get(node.property.caller.value);
 			if(!property) 
 				return ErrorObj.create(`Property named "${node.property.caller.value}" does not exist on type: ${obj.type}`, []);
-			if(property instanceof Obj) 
+			if(property instanceof FunctionObj){
+				return this.apply_function(property, [...this.eval_expressions(node.property.arguments || [], env)]);
+			}
+			if(property instanceof Obj ) 
 				return ErrorObj.create(`"${node.property.caller.value}" is not a function. got:`, [property.type]);
 ;
 			return property(obj, ...this.eval_expressions(node.property.arguments || [], env));

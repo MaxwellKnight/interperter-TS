@@ -34,8 +34,8 @@ enum Precedence {
 	PREFIX,
 	POWER,
 	INDEX,
-	CALL,
 	MEMBER,
+	CALL,
 };
 // { key, } | { key } | { key1: value1, key2: value2, ...}
 const PRECEDENCES = new Map<TokenType, Precedence>();

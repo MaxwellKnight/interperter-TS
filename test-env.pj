@@ -1,14 +1,14 @@
 make_tree = f(arr) {
-	create_tree = f(arr, low, high) {
-		if(low > high) return null;
-		mid = (low + high) / 2
+	create_tree = f(arr) {
+		if(len(arr) == 0) return null;
+		mid = len(arr) / 2;
 
 		return {
 			value: arr[mid],
-			left: create_tree(arr, low, mid - 1)
-			right: create_tree(arr, mid + 1, high),
-		}
-	}
+			left: create_tree(arr.slice(0, mid)),
+			right: create_tree(arr.slice(mid + 1)),
+		};
+	};
 
 	inorder = f(root) {
 		if(root == null) return;
@@ -16,18 +16,30 @@ make_tree = f(arr) {
 		inorder(root.left);
 		print(root.value);
 		inorder(root.right);
-	}
+	};
+
+	sum_tree = f(root) {
+		if(root == null) return 0;
+		
+		left_sum = sum_tree(root.left);
+		right_sum = sum_tree(root.right);
+		return left_sum + right_sum + root.value;
+	};
 	
-	tree = create_tree(A, 0, len(A) - 1);
+	tree = create_tree(arr, 0, len(arr) - 1);
 
 	return {
-		view: f() => print(tree),
-		inorder: f() => inorder(tree)
-	}
-}
+		view: 	f() => print(tree),
+		inorder: f() => inorder(tree),
+		sum: 		f() => sum_tree(tree),
+		getRoot: f() => tree
+	};
+};
 
-A = [1,2,3,4,5,6,7];
-tree = make_tree(A)
+tree = make_tree([1,2,3,4,5,6,7])
 
 tree.inorder();
 tree.view();
+print();
+tree.getRoot().value = 5
+print(tree.getRoot().value);
