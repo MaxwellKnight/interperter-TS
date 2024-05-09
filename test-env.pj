@@ -1,12 +1,23 @@
-right = 20;
-obj = {
-	left: 0,
-	right: 1,
-	complex: {
-		left: 10,
-		right,
-	},
-	func: f(x) => x ** 2,
+create_tree = f(arr, low, high) {
+	if(low > high) return null;
+	mid = (low + high) / 2
+	if(mid < 0 or mid >= len(arr)) return null;
+	
+	return {
+		value: arr[mid],
+		right: create_tree(arr, mid + 1, high),
+		left: create_tree(arr, low, mid - 1)
+	};
 }
 
-print(obj.right + obj.complex.left)
+inorder = f(root) {
+	if(root == null) return;
+	
+	inorder(root.left);
+	print(root.value);
+	inorder(root.right)
+}
+
+A = [1,2,3,4,5,6];
+tree = create_tree(A, 0, len(A))
+inorder(tree)

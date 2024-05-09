@@ -36,6 +36,7 @@ export abstract class Obj {
 export class ObjectObj extends Obj{
 	constructor(type: ObjectType){
 		super(type);
+		this.value = true;
 	}
 
 	public stringify(level = 0): string {
@@ -93,6 +94,7 @@ export class ReturnObj extends Obj {
 export class NullObj extends Obj {
 	constructor(){
 		super(ObjectType.NULL_OBJ);
+		this.value = false;
 	}
 	
 	public stringify(): string { return "null"; }

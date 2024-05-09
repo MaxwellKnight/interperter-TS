@@ -102,7 +102,7 @@ class Evaluator {
 			node.properties.forEach((v, k, map) => {	
 				const value = this.eval(v, env);
 				if(ErrorObj.isError(value)) return value;
-				
+
 				let key: Obj;
 				if(k instanceof Identifier){
 					if(map.get(k) === null){
@@ -184,9 +184,6 @@ class Evaluator {
    * Evaluates an expression with a given operator and two operands (infix).
    */
 	private eval_infix_expression(operator: string, left: Obj, right: Obj): Obj {
-		if(left.type !== right.type) 
-			return ErrorObj.create("Invalid operation on operands tryin:", [left.type, operator, right.type]);
-
 		if((left instanceof IntegerObj) && (right instanceof IntegerObj))
 			return this.eval_integer_infix_expression(operator, left, right);
 
@@ -204,6 +201,9 @@ class Evaluator {
 	
 		else if(operator === 'or')
 			return this.is_truthy(left) || this.is_truthy(right) ? TRUE : FALSE;
+
+		if(left.type !== right.type) 
+		return ErrorObj.create("Invalid operation on operands tryin:", [left.type, operator, right.type]);
 		
 		return ErrorObj.create("Unknown operator:", [left.type, operator, right.type]);
 	}
