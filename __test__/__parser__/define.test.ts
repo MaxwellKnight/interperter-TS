@@ -4,9 +4,9 @@ import { checkParserErrors, testLiteralExpression } from "./helper";
 
 describe("Parser - Let Statements", () => {
 	const tests = [
-	  { input: "def x = 5;", expectedIdentifier: "x", expectedValue: 5 },
-	  { input: "def y = true;", expectedIdentifier: "y", expectedValue: true },
-	  { input: "def foobar = y;", expectedIdentifier: "foobar", expectedValue: "y" },
+	  { input: "x = 5;", expectedIdentifier: "x", expectedValue: 5 },
+	  { input: "y = true;", expectedIdentifier: "y", expectedValue: true },
+	  { input: "foobar = y;", expectedIdentifier: "foobar", expectedValue: "y" },
 	];
  
 	tests.forEach((test) => {

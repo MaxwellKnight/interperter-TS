@@ -180,8 +180,6 @@ export class Parser {
 			return this.parse_assignment_statement();
 		
 		switch(this.#current.type){
-			case TokenType.DEFINE:
-				return this.parse_assignment_statement();
 			case TokenType.RETURN:
 				return this.parse_return_statement();
 			default:

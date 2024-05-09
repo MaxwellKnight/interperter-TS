@@ -44,9 +44,8 @@ describe('Lexer', () => {
 	});
 
 	it('should tokenize keywords', () => {
-		const lexer = new Lexer("def true false if else return");
+		const lexer = new Lexer("true false if else return");
 		const expectedTokens = [
-			new Token(TokenType.DEFINE, "def"),
 			new Token(TokenType.TRUE, "true"),
 			new Token(TokenType.FALSE, "false"),
 			new Token(TokenType.IF, "if"),
@@ -62,9 +61,9 @@ describe('Lexer', () => {
   });
 
 	it('should handle whitespace and newlines', () => {
-		const lexer = new Lexer("   \n\t\r  def  \n");
+		const lexer = new Lexer("   \n\t\r  yeah  \n");
 		const expectedTokens = [
-			new Token(TokenType.DEFINE, "def"),
+			new Token(TokenType.IDENTIFIER, "yeah"),
 			new Token(TokenType.EOF, "\0")
 		];
 
@@ -90,12 +89,12 @@ describe('Lexer', () => {
 	});
 
 	it('should tokenize entire test file', () => {
-		const lexer = new Lexer(`def five = 5;
-		def ten = 10;
-		def add => f(x, y) {
+		const lexer = new Lexer(`five = 5;
+		ten = 10;
+		add => f(x, y) {
 			x + y;
 		};
-		def result = add(five, ten);
+		result = add(five, ten);
 		!-/*5
 		5 < 10 > 5
 		if (5 < 10) {
@@ -116,19 +115,16 @@ describe('Lexer', () => {
 		`)
 
 		const expectedTokens = [
-			new Token(TokenType.DEFINE, 'def'),
 			new Token(TokenType.IDENTIFIER, 'five'),
 			new Token(TokenType.ASSIGN, '='),
 			new Token(TokenType.INT, '5'),
 			new Token(TokenType.SEMICOLON, ';'),
 	  
-			new Token(TokenType.DEFINE, 'def'),
 			new Token(TokenType.IDENTIFIER, 'ten'),
 			new Token(TokenType.ASSIGN, '='),
 			new Token(TokenType.INT, '10'),
 			new Token(TokenType.SEMICOLON, ';'),
 	  
-			new Token(TokenType.DEFINE, 'def'),
 			new Token(TokenType.IDENTIFIER, 'add'),
 			new Token(TokenType.ARROW, '=>'),
 			new Token(TokenType.FUNCTION, 'f'),
@@ -146,7 +142,6 @@ describe('Lexer', () => {
 			new Token(TokenType.RBRACE, '}'),
 			new Token(TokenType.SEMICOLON, ';'),
 	  
-			new Token(TokenType.DEFINE, 'def'),
 			new Token(TokenType.IDENTIFIER, 'result'),
 			new Token(TokenType.ASSIGN, '='),
 			new Token(TokenType.IDENTIFIER, 'add'),

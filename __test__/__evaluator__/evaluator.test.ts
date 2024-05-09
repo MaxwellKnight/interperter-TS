@@ -123,7 +123,7 @@ describe("Evaluator - String concatenation", () => {
 describe("Evaluator - Array Literals", () => {
 	const tests = [
 		{input: "[1, 2, 3 ** 2]", expected: [1, 2, 9]},
-		{input: "def foo = 5; [foo]", expected: [5]},
+		{input: "foo = 5; [foo]", expected: [5]},
 	]
 
 	tests.forEach((test) => {
@@ -253,10 +253,10 @@ describe("Evaluator - Test Error Object and Error messages", () => {
 
 describe("Evaluator - Test Def statements", () => {
 	const tests = [
-		{input: "def a = 5; a;", expected: 5},
-		{input: "def a = 5 * 5; a;", expected: 25},
-		{input: "def a = 5; def b = a; b;", expected: 5},
-		{input: "def a = 5; def b = a; def c = a + b + 5; c;", expected: 15}, 
+		{input: "a = 5; a;", expected: 5},
+		{input: "a = 5 * 5; a;", expected: 25},
+		{input: "a = 5; b = a; b;", expected: 5},
+		{input: "a = 5; b = a; c = a + b + 5; c;", expected: 15}, 
 	];
  
 	tests.forEach((test) => {
@@ -302,11 +302,11 @@ describe("Function Object Tests", () => {
 
 describe("Evaluator - Test Call Expressions", () => {
 	const tests = [
-		{input: "def identity = f(x) { x; }; identity(5);", expected: 5},
-		{input: "def identity = f(x) { return x; }; identity(5);", expected: 5},
-		{input: "def double = f(x) { x * 2; }; double(5);", expected: 10},
-		{input: "def add = f(x, y) { x + y; }; add(5, 5);", expected: 10}, 
-		{input: "def add = f(x, y) { x + y; }; add(5 + 5, add(5, 5));", expected: 20},
+		{input: "identity = f(x) { x; }; identity(5);", expected: 5},
+		{input: "identity = f(x) { return x; }; identity(5);", expected: 5},
+		{input: "double = f(x) { x * 2; }; double(5);", expected: 10},
+		{input: "add = f(x, y) { x + y; }; add(5, 5);", expected: 10}, 
+		{input: "add = f(x, y) { x + y; }; add(5 + 5, add(5, 5));", expected: 20},
 		{input: "f(x) { x; }(5)", expected: 5}
 	];
  
@@ -322,10 +322,10 @@ describe("Evaluator - Test Call Expressions", () => {
 describe("Evaluator - Test Closure", () => {
 	const tests = [
 		{input: `
-		def newAdder = f(x) {
+		newAdder = f(x) {
 		  f(y) { x + y };
 		};
-		def addTwo = newAdder(2);
+		addTwo = newAdder(2);
 		addTwo(2);`, expected: 4}
 	];
  
@@ -362,9 +362,9 @@ describe("Evaluator - Test Builtin Functions", () => {
 
 describe("Evaluator - Test Index Expressions", () => {
 	const tests = [
-		{input: "def i = 0; [1][i];", expected: 1},
+		{input: "i = 0; [1][i];", expected: 1},
 		{input: "[1, 2, 3][1 + 1];", expected: 3}, 
-		{input: "def myArray = [1, 2, 3]; myArray[0] + myArray[1] + myArray[2];", expected: 6},
+		{input: "myArray = [1, 2, 3]; myArray[0] + myArray[1] + myArray[2];", expected: 6},
 		{input: "[1, 2, 3][3]", expected: null},
 		{input: "[1, 2, 3][-1]", expected: null}
 	];

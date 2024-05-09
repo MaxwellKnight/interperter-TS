@@ -3,7 +3,6 @@ import { TokenType, Token } from "./interfaces/token";
 
 const KEYWORDS: { [key: string]: TokenType } = {
 	"f": TokenType.FUNCTION,
-	"def": TokenType.DEFINE,
 	"true": TokenType.TRUE,
 	"false": TokenType.FALSE,
 	"and": TokenType.AND,

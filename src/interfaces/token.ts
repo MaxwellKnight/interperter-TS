@@ -18,7 +18,6 @@ export enum TokenType {
 	ASTERISK = "asterisk",
 	DOUBLE_ASTERISK = "double_asterisk",
 	PERCENT = "percent",
-	DEFINE = "define",
 	FUNCTION = "function",
 	EOF = "EOF",
 	ILLEGAL = "illegal",

@@ -41,5 +41,4 @@ tree = make_tree([1,2,3,4,5,6,7])
 tree.inorder();
 tree.view();
 print();
-tree.getRoot().value = 5
 print(tree.getRoot().value);
