@@ -282,14 +282,18 @@ class Evaluator {
 						obj.elements[index] = value;
 				}
 			}
+			return value;
 		}
 		else if(left instanceof MemberExpression){
 			const obj = this.eval(left.object, env);
+			if(ErrorObj.isError(obj)) return obj;
+
 			const property = left.property as Identifier;
 			obj.properties.set(property.value, value);
+			return value;
 		}
 
-		return NULL;
+		return ErrorObj.create("Illegal assignmnet to type:", [left.stringify()]);
 	}
 
 	public apply_function(fn: Obj, args: Obj[]): Obj{

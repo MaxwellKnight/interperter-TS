@@ -156,15 +156,15 @@ describe("Parser - Def Statements", () => {
 			checkParserErrors(parser);  
 		
 			expect(program.statements.length).toBe(1);  
-			const stmt = program.statements[0] as AssignExpression; 
-			const name = stmt.left as Identifier;
-
+			const stmt = program.statements[0] as ExpressionStatement; 
+			const assign = stmt.expression as AssignExpression;
+			const left = assign.left as Identifier;
 
 			// Validate that it's a define statement with the expected identifier
-			expect(name.value).toBe(test.expectedIdentifier);
+			expect(left.value).toBe(test.expectedIdentifier);
 
 			// Test the value of the let statement
-			const value = stmt.value;  // Get the value from the define statement
+			const value = assign.value;  // Get the value from the define statement
 			expect(testLiteralExpression(value, test.expectedValue)).toBe(true);  // Check if the value matches the expected value
 		});
 	});
