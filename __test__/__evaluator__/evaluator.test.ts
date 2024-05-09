@@ -411,3 +411,17 @@ describe("Evaluator - Test Logical Expressions", () => {
 		});
 	});
 });
+
+describe("Parser - Assignment Expressions", () => {
+	const tests = [
+		{ input: "foobar = { key: 5 }; foobar.key = 10; foobar.key;", expectedValue: 10 },
+		{ input: "arr = [1,2,3]; arr[0] = 5; arr[0];", expectedValue: 5 },
+	];
+ 
+	tests.forEach((test) => {
+	  it(`should evaluate assignment expression with member expr: '${test.expectedValue}'`, () => {
+			const evaluated = testEval(test.input);
+			expect(testIntegerObject(evaluated, test.expectedValue)).toBe(true);  // Check if the value matches the expected value
+	  });
+	});
+});

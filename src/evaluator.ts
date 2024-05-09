@@ -1,5 +1,5 @@
 import { Enviroment, builtin_first, builtin_last, builtin_len, builtin_print, builtin_rest } from "./enviroment";
-import { ArrayLiteral, ArrowFunctionLiteral, BlockStatement, BooleanExpression, CallExpression, DefineStatement, Expression, ExpressionStatement, FunctionLiteral, Identifier, IfExpression, IndexExpression, InfixExpression, IntegerLiteral, MemberExpression, Node, ObjectLiteral, PrefixExpression, Program, ReturnStatement, Statement, StringLiteral } from "./interfaces/nodes";
+import { ArrayLiteral, ArrowFunctionLiteral, AssignExpression, BlockStatement, BooleanExpression, CallExpression, Expression, ExpressionStatement, FunctionLiteral, Identifier, IfExpression, IndexExpression, InfixExpression, IntegerLiteral, MemberExpression, Node, ObjectLiteral, PrefixExpression, Program, ReturnStatement, Statement, StringLiteral } from "./interfaces/nodes";
 import { ArrayObj, BooleanObj, BuiltinObj, ErrorObj, FALSE, FunctionObj, IntegerObj, NULL, NullObj, Obj, ObjectObj, ObjectType, ReturnObj, StringObj, TRUE } from "./interfaces/object";
 
 export const envs: Enviroment[] = [];
@@ -57,12 +57,8 @@ class Evaluator {
 		else if(node instanceof Identifier){
 			return this.eval_identifier(node, env);
 		}
-		else if(node instanceof DefineStatement){
-			const value = this.eval(node.value, env);
-			if(ErrorObj.isError(value)) return value;
-
-			env.set(node.name.value, value);
-			return value;
+		else if(node instanceof AssignExpression){
+			return this.eval_assignment_expr(node, env);
 		}
 		else if(node instanceof FunctionLiteral || node instanceof ArrowFunctionLiteral){
 			const fn = new FunctionObj();
@@ -265,6 +261,35 @@ class Evaluator {
 			result.push(expr);
 		}
 		return result;
+	}
+
+	private eval_assignment_expr(node: AssignExpression, env: Enviroment): Obj {
+		const value = this.eval(node.value, env);
+		if(ErrorObj.isError(value)) return value;
+		const left = node.left;
+
+		if(left instanceof Identifier){
+			env.set(left.value, value);
+			return value;
+		}
+		else if(left instanceof IndexExpression){
+			const obj = env.get((left.left as Identifier).value);
+
+			if(obj instanceof ArrayObj){
+				if(left.index instanceof IntegerLiteral){
+					const index = left.index.value;
+					if(0 <= index && index < obj.elements.length)
+						obj.elements[index] = value;
+				}
+			}
+		}
+		else if(left instanceof MemberExpression){
+			const obj = this.eval(left.object, env);
+			const property = left.property as Identifier;
+			obj.properties.set(property.value, value);
+		}
+
+		return NULL;
 	}
 
 	public apply_function(fn: Obj, args: Obj[]): Obj{

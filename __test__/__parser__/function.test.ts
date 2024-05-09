@@ -1,4 +1,4 @@
-import { ArrowFunctionLiteral, BlockStatement, CallExpression, DefineStatement, Expression, ExpressionStatement, FunctionLiteral, Identifier, InfixExpression } from "../../src/interfaces/nodes";
+import { ArrowFunctionLiteral, BlockStatement, CallExpression, AssignExpression, ExpressionStatement, FunctionLiteral, Identifier, InfixExpression } from "../../src/interfaces/nodes";
 import { Parser } from "../../src/parser";
 import { testIdentifier, testInfixExpression, testLiteralExpression, checkParserErrors } from "./helper";
 
@@ -154,12 +154,14 @@ describe("Parser - Def Statements", () => {
 			const program = parser.parse_program();  
 
 			checkParserErrors(parser);  
-
+		
 			expect(program.statements.length).toBe(1);  
-			const stmt = program.statements[0] as DefineStatement; 
+			const stmt = program.statements[0] as AssignExpression; 
+			const name = stmt.left as Identifier;
+
 
 			// Validate that it's a define statement with the expected identifier
-			expect(stmt.name.value).toBe(test.expectedIdentifier);
+			expect(name.value).toBe(test.expectedIdentifier);
 
 			// Test the value of the let statement
 			const value = stmt.value;  // Get the value from the define statement

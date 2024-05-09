@@ -89,18 +89,18 @@ export class Identifier extends Expression {
 /**
  * Represents a 'def' statement, variable | functions declarations.
  */
-export class DefineStatement extends Statement {
-  name: Identifier;
+export class AssignExpression extends Expression {
+  left: Expression;
   value: Expression | null;
 
-	constructor(token: Token) {
+	constructor(token: Token, left: Expression) {
 		super(token); 
-		this.name = new Identifier(token);
+		this.left = left;
 		this.value = null; 
 	}
 
 	public stringify(): string {
-		let template = `${this.token.literal} ${this.name.stringify()}`; 
+		let template = `${this.token.literal} ${this.left.stringify()}`; 
 		return this.value ? `${template} = ${this.value.stringify()}` : template;
 	}
 }

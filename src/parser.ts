@@ -4,7 +4,7 @@ import {
 	BlockStatement, 
 	BooleanExpression, 
 	CallExpression, 
-	DefineStatement,
+	AssignExpression,
 	Expression, 
 	ExpressionStatement, 
 	FunctionLiteral, 
@@ -56,6 +56,7 @@ PRECEDENCES.set(TokenType.DOUBLE_ASTERISK, Precedence.POWER);
 PRECEDENCES.set(TokenType.LPAREN, Precedence.CALL);
 PRECEDENCES.set(TokenType.LBRACKET, Precedence.INDEX);
 PRECEDENCES.set(TokenType.DOT, Precedence.MEMBER);
+PRECEDENCES.set(TokenType.ASSIGN, Precedence.MEMBER);
 
 type PrefixFunction = () => Expression | null;
 type InfixFunction = (left: Expression) => Expression | null;
@@ -109,6 +110,7 @@ export class Parser {
 		this.register_infix(TokenType.GTE, this.parse_infix_expr);
 		this.register_infix(TokenType.LTE, this.parse_infix_expr);
 		this.register_infix(TokenType.DOUBLE_ASTERISK, this.parse_infix_expr);
+		this.register_infix(TokenType.ASSIGN, this.parse_assignment_expr);
 	}
 
 	private advance(): void{
@@ -176,9 +178,6 @@ export class Parser {
 	}
 
 	private parse_statement(): Statement | null{
-		if(this.#peek.type === TokenType.ASSIGN) 
-			return this.parse_assignment_statement();
-		
 		switch(this.#current.type){
 			case TokenType.RETURN:
 				return this.parse_return_statement();
@@ -187,16 +186,8 @@ export class Parser {
 		}
 	}
 
-	private parse_assignment_statement(): Statement | null{
-		const stmnt = new DefineStatement(this.#current);
-
-		if(this.#current.type !== TokenType.IDENTIFIER && !this.expect(TokenType.IDENTIFIER))
-			return null;
-
-		stmnt.name = new Identifier(this.#current);
-
-		if(!this.expect(TokenType.ASSIGN))
-			return null;
+	private parse_assignment_expr(left: Expression): Statement | null{
+		const stmnt = new AssignExpression(this.#current, left);
 
 		this.advance();
 		stmnt.value = this.parse_expr(Precedence.LOWEST);
