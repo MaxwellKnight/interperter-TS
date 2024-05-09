@@ -213,7 +213,7 @@ class Evaluator {
 			case "+": 	return new IntegerObj(left.value + right.value);
 			case "-": 	return new IntegerObj(left.value - right.value);
 			case "*": 	return new IntegerObj(left.value * right.value);
-			case "/": 	return new IntegerObj(left.value / right.value);
+			case "/": 	return new IntegerObj(Math.floor(left.value / right.value));
 			case "%": 	return new IntegerObj(left.value % right.value);
 			case "**": 	return new IntegerObj(Math.pow(left.value, right.value));
 			case "<": 	return left.value < right.value ? TRUE : FALSE;
