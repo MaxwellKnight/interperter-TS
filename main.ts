@@ -2,7 +2,6 @@ import promptSync from 'prompt-sync';
 import { Parser } from './src/parser';
 import { Evaluator, envs } from './src/evaluator';
 import { Enviroment } from './src/enviroment';
-import { exec } from 'child_process';
 import fs from 'fs';
 import { dotToPdf, createEnvironmentDot } from './src/graphviz';
 
