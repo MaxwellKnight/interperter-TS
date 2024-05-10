@@ -1,5 +1,5 @@
-import { NULL } from "./evaluator";
-import { ArrayObj, ErrorObj, IntegerObj, NullObj, Obj, ObjectType } from "./interfaces/object";
+import { NULL } from "./interfaces/object";
+import { ArrayObj, ErrorObj, IntegerObj, Obj, ObjectType } from "./interfaces/object";
 
 class Enviroment {
 	#env: Map<string, Obj>;

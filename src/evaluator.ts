@@ -4,16 +4,16 @@ import { ArrayObj, BooleanObj, BuiltinObj, ErrorObj, FALSE, FunctionObj, Integer
 
 export const envs: Enviroment[] = [];
 
-class Evaluator {
+export class Evaluator {
 	builtins: Map<string, Obj>;
 
 	constructor() {
 		this.builtins = new Map<string, BuiltinObj | NullObj>;
-		this.builtins.set("len", 	new BuiltinObj(builtin_len));
-		this.builtins.set("first", new BuiltinObj(builtin_first));
-		this.builtins.set("last", 	new BuiltinObj(builtin_last));
-		this.builtins.set("rest", 	new BuiltinObj(builtin_rest));
-		this.builtins.set("print", new BuiltinObj(builtin_print));
+		this.builtins.set("len", 	new BuiltinObj(builtin_len, "len"));
+		this.builtins.set("first", new BuiltinObj(builtin_first, "first"));
+		this.builtins.set("last", 	new BuiltinObj(builtin_last, "last"));
+		this.builtins.set("rest", 	new BuiltinObj(builtin_rest, "rest"));
+		this.builtins.set("print", new BuiltinObj(builtin_print, "print"));
 		this.builtins.set("null", 	new NullObj());
 	};
 
@@ -265,36 +265,53 @@ class Evaluator {
 
 	private eval_assignment_expr(node: AssignExpression, env: Enviroment): Obj {
 		const value = this.eval(node.value, env);
-		if(ErrorObj.isError(value)) return value;
+		if (ErrorObj.isError(value)) return value;
+
 		const left = node.left;
 
-		if(left instanceof Identifier){
-			env.set(left.value, value);
-			return value;
-		}
-		else if(left instanceof IndexExpression){
-			const obj = env.get((left.left as Identifier).value);
-
-			if(obj instanceof ArrayObj){
-				if(left.index instanceof IntegerLiteral){
-					const index = left.index.value;
-					if(0 <= index && index < obj.elements.length)
-						obj.elements[index] = value;
-				}
-			}
-			return value;
-		}
-		else if(left instanceof MemberExpression){
-			const obj = this.eval(left.object, env);
-			if(ErrorObj.isError(obj)) return obj;
-
-			const property = left.property as Identifier;
-			obj.properties.set(property.value, value);
-			return value;
-		}
-
-		return ErrorObj.create("Illegal assignmnet to type:", [left.stringify()]);
+		if (left instanceof Identifier)  				return this.assign_identifier(left, value, env);
+		else if (left instanceof IndexExpression)		return this.assign_index_expr(left, value, env);
+		else if (left instanceof MemberExpression)	return this.assign_member_expr(left, value, env);
+			
+		return ErrorObj.create("Illegal assignment to type:", [left.stringify()]);
 	}
+
+	private assign_identifier(left: Identifier, value: Obj, env: Enviroment): Obj {
+		env.set(left.value, value);
+		return value;
+	}	
+
+	private assign_index_expr(left: IndexExpression, value: Obj, env: Enviroment): Obj {
+		const obj = env.get((left.left as Identifier).value);
+		if (!obj) return ErrorObj.create("Unidentified variable name", [(left.left as Identifier).value]);
+
+		if (left.index instanceof StringLiteral) {
+			obj.properties.set(left.index.value, value);
+			return value;
+
+		} else if (left.index instanceof IntegerLiteral) {
+			if (!(obj instanceof ArrayObj)) 
+				return ErrorObj.create("Invalid object for index assignment.", []);
+			
+			const index = left.index.value;
+			if (index < 0 || index >= obj.elements.length) 
+			return ErrorObj.create("Index Error, out of range.", []);
+			
+			obj.elements[index] = value;
+			return value;
+		}
+		
+		return ErrorObj.create("Invalid index type.", []);
+	}
+
+  private assign_member_expr(left: MemberExpression, value: Obj, env: Enviroment): Obj {
+		const obj = this.eval(left.object, env);
+		if (ErrorObj.isError(obj)) return obj;
+
+		const property = left.property as Identifier;
+		obj.properties.set(property.value, value);
+		return value;
+  }
 
 	public apply_function(fn: Obj, args: Obj[]): Obj{
 		if(fn instanceof FunctionObj){
@@ -320,6 +337,13 @@ class Evaluator {
 	private eval_index_expression(left: Obj, index: Obj): Obj{
 		if(left.type === ObjectType.ARRAY_OBJ && index.type === ObjectType.INTEGER_OBJ)
 			return this.eval_array_index_expression(left, index);
+		else if(index instanceof StringObj){
+			const property = left.properties.get(index.value)
+			if(!property) return ErrorObj.create(`Property named ${index.value} does not exist in`, [left.type]);
+			if(property instanceof Obj) return property;
+
+			return new BuiltinObj((...args: Obj[]) => property(left, ...args), index.value);
+		}
 		
 		return ErrorObj.create(`index operator of type "${index.type}" not supported on type:`, [`"${left.type}"`]);
 	}
@@ -376,10 +400,4 @@ class Evaluator {
 		else if(obj instanceof BooleanObj) return obj.value;
 		return true;
 	}
-}
-
-
-export {
-	Evaluator, 
-	NULL,
 }

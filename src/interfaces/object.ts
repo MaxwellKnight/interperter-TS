@@ -126,7 +126,8 @@ export class ArrayObj extends Obj {
 			return ErrorObj.create("Invalid argument count `push` takes 1, got:", [String(args.length)]);
 		}	
 		
-		return new ArrayObj([...self.elements, args[0]]);
+		self.elements.push(args[0]);
+		return NULL;
 	}
 
 	static filter(self: Obj, ...args: Obj[]): Obj  {
@@ -255,13 +256,15 @@ export class FunctionObj extends Obj {
 
 export class BuiltinObj extends Obj {
 	fn: BuiltinFunction;
+	name: string
 
-	constructor(fn: BuiltinFunction){
+	constructor(fn: BuiltinFunction, name: string = ""){
 		super(ObjectType.BUILTIN_OBJ);
 		this.fn = fn;
+		this.name = "`" + name + "`";
 	}
 
-	public stringify(level = 0): string { return `builtin function ${this.type}`; }
+	public stringify(level = 0): string { return `<builtin function ${this.name}>`; }
 }
 
 export class ErrorObj extends Obj {

@@ -42,3 +42,7 @@ tree.inorder();
 tree.view();
 print();
 print(tree.getRoot().value);
+
+while => len(arr) > 0 {
+
+}

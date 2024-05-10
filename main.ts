@@ -43,7 +43,7 @@ class REPL {
 			if (should_continue) return;
 		} else {
 			const result = evaluator.eval(program, this.#env);
-			if(should_continue) console.log(result.stringify());
+			if(should_continue) console.log(result.stringify ? result.stringify() : result);
 		}
 	}
 
