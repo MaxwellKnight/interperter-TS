@@ -1,11 +1,11 @@
 import { NULL } from "./interfaces/object";
 import { ArrayObj, ErrorObj, IntegerObj, Obj, ObjectType } from "./interfaces/object";
 
-class Enviroment {
+class Environment {
 	#env: Map<string, Obj>;
-	#parent: Enviroment | null;
+	#parent: Environment | null;
 
-	constructor(parent: Enviroment | null = null){
+	constructor(parent: Environment | null = null){
 		this.#env = new Map<string, Obj>;
 		this.#parent = parent;
 	}
@@ -21,7 +21,7 @@ class Enviroment {
 		return this.#env;
 	}
 
-	public getParent(): Enviroment | null{
+	public getParent(): Environment | null{
 		return this.#parent;
 	}
 
@@ -88,7 +88,7 @@ const builtin_print = (...args: Obj[]): Obj => {
 };
 
 export {
-	Enviroment, 
+	Environment, 
 	builtin_first,
 	builtin_last,
 	builtin_len,

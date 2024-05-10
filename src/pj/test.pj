@@ -29,10 +29,10 @@ make_tree = f(arr) {
 	tree = create_tree(arr, 0, len(arr) - 1);
 
 	return {
-		"view": 		f() => print(tree),
-		"inorder": 	f() => inorder(tree),
-		"sum": 		f() => sum_tree(tree),
-		"getRoot": 	f() => tree
+		view: 		f() => print(tree),
+		inorder: 	f() => inorder(tree),
+		sum: 			f() => sum_tree(tree),
+		getRoot: 	f() => tree
 	};
 };
 
@@ -41,7 +41,3 @@ tree.inorder();
 tree.view();
 print();
 print(tree);
-
-while => len(arr) > 0 {
-
-}

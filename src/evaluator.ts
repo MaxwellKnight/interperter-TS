@@ -1,8 +1,8 @@
-import { Enviroment, builtin_first, builtin_last, builtin_len, builtin_print, builtin_rest } from "./enviroment";
+import { Environment, builtin_first, builtin_last, builtin_len, builtin_print, builtin_rest } from "./environment";
 import { ArrayLiteral, ArrowFunctionLiteral, AssignExpression, BlockStatement, BooleanExpression, CallExpression, Expression, ExpressionStatement, FunctionLiteral, Identifier, IfExpression, IndexExpression, InfixExpression, IntegerLiteral, MemberExpression, Node, ObjectLiteral, PrefixExpression, Program, ReturnStatement, Statement, StringLiteral } from "./interfaces/nodes";
 import { ArrayObj, BooleanObj, BuiltinObj, ErrorObj, FALSE, FunctionObj, IntegerObj, NULL, NullObj, Obj, ObjectObj, ObjectType, ReturnObj, StringObj, TRUE } from "./interfaces/object";
 
-export const envs: Enviroment[] = [];
+export const envs: Environment[] = [];
 
 export class Evaluator {
 	builtins: Map<string, Obj>;
@@ -20,7 +20,7 @@ export class Evaluator {
 	/**
    * Evaluates a given AST node, returning the appropriate object.
    */
-	public eval(node: Node | null, env: Enviroment): Obj {
+	public eval(node: Node | null, env: Environment): Obj {
 		if(envs.length === 0) envs.push(env);
 
 		if(     node instanceof IntegerLiteral)		return new IntegerObj(node.value);
@@ -123,7 +123,7 @@ export class Evaluator {
 	/**
    * Evaluates a program consisting of multiple statements.
    */
-	private eval_program(statements: Statement[], env: Enviroment): Obj {
+	private eval_program(statements: Statement[], env: Environment): Obj {
 		let result = new NullObj();
 
 		for(const statement of statements){
@@ -137,7 +137,7 @@ export class Evaluator {
 		return result;
 	}
 
-	private eval_block_statement(node: BlockStatement, env: Enviroment): Obj  {
+	private eval_block_statement(node: BlockStatement, env: Environment): Obj  {
 		let result = new NullObj();
 
 		for(const statement of node.statements){
@@ -229,7 +229,7 @@ export class Evaluator {
 		}
 	}
 
-	private eval_if_expression(if_expr: IfExpression, env: Enviroment): Obj {
+	private eval_if_expression(if_expr: IfExpression, env: Environment): Obj {
 		const condition = this.eval(if_expr.condition, env);
 		if(ErrorObj.isError(condition)) return condition;
 
@@ -242,7 +242,7 @@ export class Evaluator {
 		return NULL;
 	}
 
-	private eval_identifier(node: Identifier, env: Enviroment): Obj{
+	private eval_identifier(node: Identifier, env: Environment): Obj{
 		const obj =  env.get(node.value);
 		if(obj) return obj
 
@@ -252,7 +252,7 @@ export class Evaluator {
 		return ErrorObj.create("Unknown identifier:", [node.value]);
 	}
 
-	private eval_expressions(expressions: Expression[], env: Enviroment): Obj[]{
+	private eval_expressions(expressions: Expression[], env: Environment): Obj[]{
 		const result: Obj[] = [];
 
 		for(const expression of expressions){
@@ -263,7 +263,7 @@ export class Evaluator {
 		return result;
 	}
 
-	private eval_assignment_expr(node: AssignExpression, env: Enviroment): Obj {
+	private eval_assignment_expr(node: AssignExpression, env: Environment): Obj {
 		const value = this.eval(node.value, env);
 		if (ErrorObj.isError(value)) return value;
 
@@ -276,12 +276,12 @@ export class Evaluator {
 		return ErrorObj.create("Illegal assignment to type:", [left.stringify()]);
 	}
 
-	private assign_identifier(left: Identifier, value: Obj, env: Enviroment): Obj {
+	private assign_identifier(left: Identifier, value: Obj, env: Environment): Obj {
 		env.set(left.value, value);
 		return value;
 	}	
 
-	private assign_index_expr(left: IndexExpression, value: Obj, env: Enviroment): Obj {
+	private assign_index_expr(left: IndexExpression, value: Obj, env: Environment): Obj {
 		const obj = env.get((left.left as Identifier).value);
 		if (!obj) return ErrorObj.create("Unidentified variable name", [(left.left as Identifier).value]);
 
@@ -304,7 +304,7 @@ export class Evaluator {
 		return ErrorObj.create("Invalid index type.", []);
 	}
 
-  private assign_member_expr(left: MemberExpression, value: Obj, env: Enviroment): Obj {
+  private assign_member_expr(left: MemberExpression, value: Obj, env: Environment): Obj {
 		const obj = this.eval(left.object, env);
 		if (ErrorObj.isError(obj)) return obj;
 
@@ -326,8 +326,8 @@ export class Evaluator {
 		return ErrorObj.create("not a function:", [fn.type]);
 	}
 	
-	private extend_function_env(fn: FunctionObj, args: Obj[]): Enviroment {
-		const env = new Enviroment(fn.env);
+	private extend_function_env(fn: FunctionObj, args: Obj[]): Environment {
+		const env = new Environment(fn.env);
 		for(let i = 0; i < fn.parameters!.length; i++){
 			env.set(fn.parameters![i].value, args[i]);
 		}
@@ -358,7 +358,7 @@ export class Evaluator {
 		return array.elements[idx];
 	}
 
-	private eval_member_expression(node: MemberExpression, env: Enviroment): Obj {
+	private eval_member_expression(node: MemberExpression, env: Environment): Obj {
 		const obj = this.eval(node.object, env);
 		if(ErrorObj.isError(obj)) return obj;
 		if(node.property instanceof CallExpression && node.property.caller instanceof Identifier){

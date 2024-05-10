@@ -1,4 +1,4 @@
-import { Enviroment } from "../enviroment";
+import { Environment } from "../environment";
 import { Evaluator } from "../evaluator";
 import { BlockStatement, Expression, Identifier } from "./nodes";
 
@@ -65,10 +65,9 @@ export class StringObj extends Obj {
 	constructor(value: string){
 		super(ObjectType.STRING_OBJ);
 		this.value = value;
-		this.properties.set("length", new IntegerObj(value.length));
 	}
 	
-	public stringify(level = 0): string { return `"${this.value}"`; }
+	public stringify(level = 0): string { return `'${this.value}'`; }
 }
 
 export class BooleanObj extends Obj {
@@ -111,7 +110,6 @@ export class ArrayObj extends Obj {
 		this.properties.set('map', ArrayObj.map);
 		this.properties.set('reduce', ArrayObj.reduce);
 		this.properties.set('slice', ArrayObj.slice);
-		this.properties.set('length', new IntegerObj(elements.length));
 	}
 
 	public stringify(level = 0): string { 
@@ -155,13 +153,13 @@ export class ArrayObj extends Obj {
 
 	static map(self: Obj, ...args: Obj[]): Obj  {
 		if(!(self instanceof ArrayObj)) {
-			return ErrorObj.create("first argument to `filter` must be of type `array` got:", [self.type])
+			return ErrorObj.create("first argument to `map` must be of type `array` got:", [self.type])
 		}
 		if(args.length != 1){
-			return ErrorObj.create("Invalid argument count `filter` takes 1, got:", [String(args.length)]);
+			return ErrorObj.create("Invalid argument count `map` takes 1, got:", [String(args.length)]);
 		}
 		
-		if(args[0].type !== ObjectType.FUNCTION_OBJ) return ErrorObj.create("`filter` takes a function as argument", []);
+		if(args[0].type !== ObjectType.FUNCTION_OBJ) return ErrorObj.create("`map` takes a function as argument", []);
 
 		const evaluator = new Evaluator();
 		const result: Obj[] = [];
@@ -239,7 +237,7 @@ export class ArrayObj extends Obj {
 export class FunctionObj extends Obj {
 	parameters: Identifier[] | null;
 	body: BlockStatement | Expression | null;
-	env: Enviroment | null;
+	env: Environment | null;
 
 	constructor(){
 		super(ObjectType.FUNCTION_OBJ);

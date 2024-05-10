@@ -1,14 +1,14 @@
 import { exec } from "child_process";
-import { Enviroment } from "./enviroment";
+import { Environment } from "./environment";
 import fs from 'fs';
 
-export const createEnvironmentDot = (environments: Enviroment[]) => {
+export const createEnvironmentDot = (environments: Environment[]) => {
 	let dot = "digraph Environment {\n"; 
 
 	const envNodes = new Map(); 
 	let envCounter = 0;
 
-	const getEnvNode = (env: Enviroment | null) => {
+	const getEnvNode = (env: Environment | null) => {
 		if (!envNodes.has(env)) {
 			const nodeName = `Env${envCounter++}`;
 			envNodes.set(env, nodeName);
@@ -17,7 +17,7 @@ export const createEnvironmentDot = (environments: Enviroment[]) => {
 		return envNodes.get(env);
 	};
 
-	environments.forEach((env: Enviroment, index: number) => {
+	environments.forEach((env: Environment, index: number) => {
 		const currentEnvNode = getEnvNode(env);
 		const vars: string[] = [];
 		env.getEnv().forEach((obj, key) => vars.push(`${key}: ${obj.stringify()}`));
@@ -32,6 +32,7 @@ export const createEnvironmentDot = (environments: Enviroment[]) => {
 	});
 
 	dot += "}"; 
+	console.log(dot);
 	return dot;
 }
 

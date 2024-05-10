@@ -1,16 +1,16 @@
 import promptSync from 'prompt-sync';
 import { Parser } from './src/parser';
 import { Evaluator, envs } from './src/evaluator';
-import { Enviroment } from './src/enviroment';
+import { Environment } from './src/environment';
 import fs from 'fs';
 import { dotToPdf, createEnvironmentDot } from './src/graphviz';
 
 const prompt = promptSync();
 class REPL {
-  #env: Enviroment;
+  #env: Environment;
 
 	constructor() {
-		this.#env = new Enviroment();
+		this.#env = new Environment();
 	}
 
 	public run(): void {
