@@ -25,6 +25,10 @@ make_tree = f(arr) {
 		right_sum = sum_tree(root.right);
 		return left_sum + right_sum + root.value;
 	};
+
+	set = f(arr) {
+		tree = create_tree(arr);
+	}
 	
 	tree = create_tree(arr);
 
@@ -32,11 +36,13 @@ make_tree = f(arr) {
 		view: 		f() => print(tree),
 		inorder: 	f() => inorder(tree),
 		sum: 			f() => sum_tree(tree),
-		getRoot: 	f() => tree
+		getRoot: 	f() => tree,
+		set: 			set
 	};
 };
 
 tree = make_tree([1,2,3,4,5,6,7])
+tree.set([11,22,33,44]);
 tree.inorder();
 tree.view();
 print();

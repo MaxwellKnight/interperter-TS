@@ -26,8 +26,23 @@ class Environment {
 	}
 
 	public set(key: string, obj: Obj): Obj {
+		const env = Environment.retrieve(key, this);
+		env.getEnv().set(key, obj);
+		return obj;
+	}
+
+	public assign(key: string, obj: Obj): Obj {
 		this.#env.set(key, obj);
 		return obj;
+	}
+
+	static retrieve(key: string, env: Environment): Environment {
+		let current: Environment | null = env;
+		while(current !== null){
+			if(current.getEnv().has(key)) return current;
+			current = current.getParent();
+		}
+		return env;
 	}
 }
 

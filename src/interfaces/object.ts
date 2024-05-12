@@ -87,7 +87,7 @@ export class ReturnObj extends Obj {
 		this.value = value;
 	}
 
-	public stringify(level = 0): string { return this.value.stringify(); }
+	public stringify(level = 0): string { return `return ${this.value.stringify()}`; }
 }
 
 export class NullObj extends Obj {
@@ -248,7 +248,7 @@ export class FunctionObj extends Obj {
 
 	public stringify(level = 0): string {
 		const body = this.body instanceof Expression ? `=> ${this.body.stringify()}` : `{\n${this.body?.stringify()} \n}` 
-		return `f(${this.parameters?.map((param) => param.stringify())}) ${body} `
+		return `f(${this.parameters?.map((param) => param.stringify(level + 1))}) ${body} `
 	}
 }
 

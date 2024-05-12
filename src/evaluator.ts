@@ -291,7 +291,7 @@ export class Evaluator {
 
 		} else if (left.index instanceof IntegerLiteral) {
 			if (!(obj instanceof ArrayObj)) 
-				return ErrorObj.create("Invalid object for index assignment.", []);
+				return ErrorObj.create(`Object of type '${obj.type}' is immutable.`, []);
 			
 			const index = left.index.value;
 			if (index < 0 || index >= obj.elements.length) 
@@ -329,7 +329,7 @@ export class Evaluator {
 	private extend_function_env(fn: FunctionObj, args: Obj[]): Environment {
 		const env = new Environment(fn.env);
 		for(let i = 0; i < fn.parameters!.length; i++){
-			env.set(fn.parameters![i].value, args[i]);
+			env.assign(fn.parameters![i].value, args[i]);
 		}
 		return env;
 	}
@@ -337,6 +337,8 @@ export class Evaluator {
 	private eval_index_expression(left: Obj, index: Obj): Obj{
 		if(left.type === ObjectType.ARRAY_OBJ && index.type === ObjectType.INTEGER_OBJ)
 			return this.eval_array_index_expression(left, index);
+		else if(left.type === ObjectType.STRING_OBJ && index.type === ObjectType.INTEGER_OBJ)
+			return this.eval_string_index_expression(left, index);
 		else if(index instanceof StringObj){
 			const property = left.properties.get(index.value)
 			if(!property) return ErrorObj.create(`Property named ${index.value} does not exist in`, [left.type]);
@@ -353,9 +355,19 @@ export class Evaluator {
 		const idx = index.value as number;
 		const max_idx = array.elements.length - 1;
 
-		if(idx < 0 || idx > max_idx) return NULL;
+		if(idx < 0 || idx > max_idx) return ErrorObj.create("index out of range", []);
 
 		return array.elements[idx];
+	}
+
+	private eval_string_index_expression(left: Obj, index: Obj): Obj{
+		const string = left as StringObj;
+		const idx = index.value as number;
+		const max_idx = string.value.length - 1;
+
+		if(idx < 0 || idx > max_idx) return ErrorObj.create("index out of range", []);
+
+		return new StringObj(string.value[idx]);
 	}
 
 	private eval_member_expression(node: MemberExpression, env: Environment): Obj {

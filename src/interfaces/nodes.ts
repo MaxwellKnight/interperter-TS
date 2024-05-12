@@ -15,7 +15,7 @@ export abstract class Node {
 	* Returns a string representation of the node.
 	* Abstract, must be implemented in subclasses.
 	*/
-	public abstract stringify(): string;
+	public abstract stringify(level?: number): string;
 }
 
 /**
@@ -46,8 +46,11 @@ export class ExpressionStatement extends Statement {
 		super(token); 
 		this.expression = null;
 	}
-
-	public stringify(): string { return this.expression ? this.expression.stringify() : ""; }
+	public stringify(level = 0): string { 
+		let level_str = '';
+		for(let i = 0; i < level; i++) level_str += ' ';
+		return this.expression ? `${level_str + this.expression.stringify(level)}` : ""; 
+	}
 }
 
 /**
@@ -65,8 +68,10 @@ export class Program extends Statement{
 		return this.statements.length > 0 ? this.statements[0].token.type : ""; 
 	}
 
-	public stringify(): string{
-		return this.statements.map((stmnt) => stmnt.stringify()).join(';\n');
+	public stringify(level = 0): string{
+		let level_str = '';
+		for(let i = 0; i < level; i++) level_str += ' ';
+		return this.statements.map((stmnt) => `${level_str + stmnt.stringify(level)}`).join('\n');
 	} 
 }
 
@@ -81,8 +86,10 @@ export class Identifier extends Expression {
 		this.value = token.literal; 
 	}
 
-	public stringify(): string {
-		return this.value; 
+	public stringify(level = 0): string {
+		let level_str = '';
+		for(let i = 0; i < level; i++) level_str += ' ';
+		return `${level_str + this.value}`; 
 	}
 }
 
@@ -99,9 +106,11 @@ export class AssignExpression extends Expression {
 		this.value = null; 
 	}
 
-	public stringify(): string {
-		let template = `${this.token.literal} ${this.left.stringify()}`; 
-		return this.value ? `${template} = ${this.value.stringify()}` : template;
+	public stringify(level = 0): string {
+		let level_str = '';
+		for(let i = 0; i < level; i++) level_str += ' ';
+		let template = `${this.left.stringify(level)}`; 
+		return this.value ? `${level_str + template} = ${this.value.stringify()}` : template;
 	}
 }
 
@@ -113,8 +122,10 @@ export class ReturnStatement extends Statement {
 		this.value = null; 
 	}
 
-	public stringify(): string {
-		return this.value ? `${this.token.literal} ${this.value.stringify()}` : ""; 
+	public stringify(level = 0): string {
+		let level_str = '';
+		for(let i = 0; i < level + 1; i++) level_str += ' ';
+		return this.value ? `${level_str}${this.token.literal} ${this.value.stringify(level)}` : level_str; 
 	}
 }
 
@@ -126,7 +137,11 @@ export class IntegerLiteral extends Expression {
 		this.value = Number(token.literal); 
 	}
 
-	public stringify(): string { return this.token.literal; }
+	public stringify(level = 0): string { 
+		let level_str = '';
+		for(let i = 0; i < level; i++) level_str += ' ';
+		return `${level_str + this.token.literal}`; 
+	}
 }
 
 export class StringLiteral extends Expression {
@@ -137,7 +152,11 @@ export class StringLiteral extends Expression {
 		this.value = token.literal; 
 	}
 
-	public stringify(): string { return `"${this.token.literal}"`; }
+	public stringify(level = 0): string { 
+		let level_str = '';
+		for(let i = 0; i < level; i++) level_str += ' ';
+		return `${level_str + `'${this.token.literal}'`}`; 
+	}
 }
 
 export class BooleanExpression extends Expression {
@@ -148,7 +167,11 @@ export class BooleanExpression extends Expression {
 		this.value = value;
 	}
 
-	public stringify(): string { return this.token.literal; }
+	public stringify(level = 0): string { 
+		let level_str = '';
+		for(let i = 0; i < level; i++) level_str += ' ';
+		return `${level_str + this.token.literal}`; 
+	}
 }
 
 /**
@@ -163,7 +186,11 @@ export class PrefixExpression extends Expression {
 		this.right = null;
 	}
 
-	public stringify(): string { return this.right ? `(${this.operator}${this.operator === 'not' ? ' ': ''}${this.right.stringify()})` : ""; }
+	public stringify(level = 0): string { 
+		let level_str = '';
+		for(let i = 0; i < level; i++) level_str += ' ';
+		return this.right ? `(${level_str + this.operator}${this.operator === 'not' ? ' ': ''}${level_str + this.right.stringify()})` : ""; 
+	}
 }
 
 /**
@@ -181,8 +208,10 @@ export class InfixExpression extends Expression {
 		this.right = null;
 	}
 
-	public stringify(): string {
-		return `(${this.left ? this.left.stringify() : ""} ${this.operator} ${this.right ? this.right.stringify() : ""})`
+	public stringify(level = 0): string {
+		let level_str = '';
+		for(let i = 0; i < level; i++) level_str += ' ';
+		return `(${this.left ? level_str + this.left.stringify() : level_str} ${this.operator} ${this.right ? this.right.stringify() : ""})`
 	}
 }
 
@@ -196,8 +225,10 @@ export class BlockStatement extends Statement {
 		this.statements = [];
 	}
 
-	public stringify(): string {
-		return this.statements.map((stmnt) => stmnt.stringify()).join(';\n');
+	public stringify(level = 0): string {
+		let level_str = '';
+		for(let i = 0; i < level; i++) level_str += ' ';
+		return this.statements.map((stmnt) => `${level_str}${stmnt.stringify(level)}`).join('\n');
 	}
 }
 
@@ -216,8 +247,10 @@ export class IfExpression extends Expression {
 		this.else_case = null;
 	}
 
-	public stringify(): string {
-		return `if (${this.condition?.stringify()}) { ${this.if_case} } ${this.else_case ? `else { ${this.else_case.stringify()} }` : ""}`;
+	public stringify(level = 0): string {
+		let level_str = '';
+		for(let i = 0; i < level; i++) level_str += ' ';
+		return `${level_str}if (${this.condition?.stringify()}) { ${this.if_case?.stringify(level + 1)} } ${this.else_case ? `else { ${this.else_case.stringify(level + 1)} }` : ""}`;
 	}
 }
 
@@ -234,10 +267,14 @@ export class FunctionLiteral extends Expression {
 		this.body = null;
 	}
 
-	public stringify(): string {
+	public stringify(level = 0): string {
+		let level_str = '';
+		for (let i = 0; i < level; i++) level_str += ' ';
 		const params_str = this.parameters?.map((ident) => ident.stringify()).join(",");
-		return `${this.token.literal}(${params_str}) { ${this.body?.stringify()} }`;
-	}
+		const body_str = this.body ? this.body.stringify(level + 1) : ''; // Indent the body
+  
+		return `${level_str + this.token.literal}(${params_str}) {\n${body_str}\n${level_str}}`;
+  }
 }
 
 /**
@@ -253,8 +290,8 @@ export class ArrowFunctionLiteral extends Expression {
 		this.body = null;
 	}
 
-	public stringify(): string {
-		const params_str = this.parameters?.map((ident) => ident.stringify()).join(",");
+	public stringify(level = 0): string {
+		const params_str = this.parameters?.map((ident) => ident.stringify(level)).join(",");
 		return `${this.token.literal}(${params_str}) => ${this.body?.stringify()};`;
 	}
 }
@@ -272,15 +309,15 @@ export class CallExpression extends Expression {
 		this.arguments = null;
 	}
 
-	public stringify(): string {
+	public stringify(level = 0): string {
 		const args: string[] = [];
 		if(this.arguments){
 			for(const arg of this.arguments){
-				args.push(arg.stringify());
+				args.push(arg.stringify(level));
 			}
 		}
 
-		return `${this.caller?.stringify()}(${args.join(', ')})`;
+		return `${this.caller?.stringify(level)}(${args.join(', ')})`;
 	}
 }
 
@@ -294,7 +331,7 @@ export class MemberExpression extends Expression {
 		this.property = null;
 	}
 
-	public stringify(): string { return `(${this.object?.stringify()}.${this.property?.stringify()})`; }
+	public stringify(level = 0): string { return `(${this.object?.stringify(level)}.${this.property?.stringify(level)})`; }
 }
 
 export class ArrayLiteral extends Expression {
@@ -305,8 +342,8 @@ export class ArrayLiteral extends Expression {
 		this.elements = [];
 	}
 
-	public stringify(): string { 
-		const elems = this.elements.map((elem) => elem.stringify());
+	public stringify(level = 0): string { 
+		const elems = this.elements.map((elem) => elem.stringify(level));
 		return `([${elems.join(", ")}])`;
 	}
 }
@@ -321,7 +358,7 @@ export class IndexExpression extends Expression {
 		this.index = null;
 	}
 
-	public stringify(): string { return `(${this.left.stringify()}[${this.index?.stringify()}])`; }
+	public stringify(level = 0): string { return `(${this.left.stringify(level)}[${this.index?.stringify(level)}])`; }
 }
 
 export class ObjectLiteral extends Expression {
@@ -332,7 +369,7 @@ export class ObjectLiteral extends Expression {
 		this.properties = new Map<Expression, Expression | null>;
 	}
 
-	public stringify(): string {
+	public stringify(level = 0): string {
 		const properties: string[][] = [];
 		this.properties.forEach((value, key) => {
 			if(typeof value === 'function')
