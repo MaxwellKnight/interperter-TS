@@ -232,7 +232,6 @@ export class Parser {
 				this.peekError(TokenType.RBRACE);
 				return null;
 			}
-			this.advance();
 		}else loop.body = this.parse_expr_statement();
 		
 		if(this.compare_peek(TokenType.SEMICOLON)) 
