@@ -1,7 +1,7 @@
 // tests/expression.test.ts
 import { Parser } from "../../src/parser";
-import { ExpressionStatement, Identifier, IntegerLiteral, PrefixExpression, InfixExpression, Expression, StringLiteral, ArrayLiteral, IndexExpression } from "../../src/interfaces/nodes";
-import { testIdentifier, testInfixExpression, testLiteralExpression } from "./helper";
+import { ExpressionStatement, Identifier, IntegerLiteral, PrefixExpression, InfixExpression, Expression, StringLiteral, ArrayLiteral, IndexExpression, AssignExpression } from "../../src/interfaces/nodes";
+import { checkParserErrors, testIdentifier, testInfixExpression, testLiteralExpression } from "./helper";
 
 describe("Parser - Identifier Expression", () => {
 	it("should parse a simple identifier expression", () => {
@@ -266,7 +266,7 @@ describe("Parser - Member Expression Parsing", () => {
 		{ input: "max.the.king()[0]", expected: "(((max.the).king())[0])" },
 		{ input: "5 * 2 + orr.yona", expected: "((5 * 2) + (orr.yona))" },
 		{ input: "5 / dor.shamen", expected: "(5 / (dor.shamen))" },
-		{ input: `lior.the.shamen["duby"]`, expected: `(((lior.the).shamen)["duby"])` },
+		{ input: `lior.the.shamen["duby"]`, expected: `(((lior.the).shamen)['duby'])` },
 		{ input: `[1, 2, 3].sort()`, expected: `(([1, 2, 3]).sort())` },
 		{ input: `[1, 2, 3].sort().map(x, y)`, expected: `((([1, 2, 3]).sort()).map(x, y))` },
 	];
@@ -287,5 +287,34 @@ describe("Parser - Member Expression Parsing", () => {
 			// Check if the parsed expression's string representation matches the expected output
 			expect(expression.stringify()).toBe(test.expected);
 		});
+	});
+});
+
+describe("Parser - Assignment Expressions", () => {
+	const tests = [
+	  { input: "x = 5;", expectedIdentifier: "x", expectedValue: 5 },
+	  { input: "y = true;", expectedIdentifier: "y", expectedValue: true },
+	  { input: "foobar = y;", expectedIdentifier: "foobar", expectedValue: "y" },
+	];
+ 
+	tests.forEach((test) => {
+	  it(`should parse assign expressions with identifier '${test.expectedIdentifier}' and value '${test.expectedValue}'`, () => {
+			const parser = new Parser(test.input);  // Create a parser with the lexer
+			const program = parser.parse_program();  // Parse the program into an AST
+
+			checkParserErrors(parser);  // Ensure no parsing errors occurred
+
+			expect(program.statements.length).toBe(1);  // Ensure there's one statement in the program
+			const stmt = program.statements[0] as ExpressionStatement;  // Get the first statement
+			const assign = stmt.expression as AssignExpression;
+			const left = assign.left as Identifier;
+			
+			// Validate that it's a define statement with the expected identifier
+			expect(left.value).toBe(test.expectedIdentifier);
+
+			// Test the value of the let statement
+			const value = assign.value;  // Get the value from the define statement
+			expect(testLiteralExpression(value, test.expectedValue)).toBe(true);  // Check if the value matches the expected value
+	  });
 	});
 });

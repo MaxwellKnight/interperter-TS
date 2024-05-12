@@ -19,7 +19,8 @@ import {
 	Program, 
 	ReturnStatement, 
 	Statement, 
-	StringLiteral
+	StringLiteral,
+	WhileStatement
 } from "./interfaces/nodes";
 import { Token, TokenType } from "./interfaces/token";
 import { Lexer } from "./lexer";
@@ -181,6 +182,8 @@ export class Parser {
 		switch(this.#current.type){
 			case TokenType.RETURN:
 				return this.parse_return_statement();
+			case TokenType.WHILE:
+				return this.parse_while_loop();
 			default:
 				return this.parse_expr_statement();
 		}
@@ -208,6 +211,34 @@ export class Parser {
 			this.advance();
 
 		return stmnt;
+	}
+
+	private parse_while_loop(): Statement | null {
+		const loop = new WhileStatement(this.#current);
+		if(!this.expect(TokenType.LPAREN)) return null;
+		this.advance();
+
+		const condition = this.parse_expr(Precedence.LOWEST);
+		if(!condition) return null;
+		loop.condition = condition;
+
+		if(!this.expect(TokenType.RPAREN)) return null;
+
+		this.advance();
+
+		if(this.compare_current(TokenType.LBRACE)){
+			loop.body = this.parse_block_statement();
+			if(!this.compare_current(TokenType.RBRACE)) {
+				this.peekError(TokenType.RBRACE);
+				return null;
+			}
+			this.advance();
+		}else loop.body = this.parse_expr_statement();
+		
+		if(this.compare_peek(TokenType.SEMICOLON)) 
+			this.advance();
+
+		return loop;
 	}
 
 	private parse_expr_statement(): ExpressionStatement {

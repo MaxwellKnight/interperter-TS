@@ -1,5 +1,5 @@
 import { Environment, builtin_first, builtin_last, builtin_len, builtin_print, builtin_rest } from "./environment";
-import { ArrayLiteral, ArrowFunctionLiteral, AssignExpression, BlockStatement, BooleanExpression, CallExpression, Expression, ExpressionStatement, FunctionLiteral, Identifier, IfExpression, IndexExpression, InfixExpression, IntegerLiteral, MemberExpression, Node, ObjectLiteral, PrefixExpression, Program, ReturnStatement, Statement, StringLiteral } from "./interfaces/nodes";
+import { ArrayLiteral, ArrowFunctionLiteral, AssignExpression, BlockStatement, BooleanExpression, CallExpression, Expression, ExpressionStatement, FunctionLiteral, Identifier, IfExpression, IndexExpression, InfixExpression, IntegerLiteral, MemberExpression, Node, ObjectLiteral, PrefixExpression, Program, ReturnStatement, Statement, StringLiteral, WhileStatement } from "./interfaces/nodes";
 import { ArrayObj, BooleanObj, BuiltinObj, ErrorObj, FALSE, FunctionObj, IntegerObj, NULL, NullObj, Obj, ObjectObj, ObjectType, ReturnObj, StringObj, TRUE } from "./interfaces/object";
 
 export const envs: Environment[] = [];
@@ -30,6 +30,7 @@ export class Evaluator {
 		else if(node instanceof BlockStatement)		return this.eval_block_statement(node, env);
 		else if(node instanceof ExpressionStatement)	return this.eval(node.expression, env);
 		else if(node instanceof MemberExpression)		return this.eval_member_expression(node, env);
+		else if(node instanceof WhileStatement)		return this.eval_while_statement(node, env);
 		else if(node instanceof PrefixExpression){
 			const operand = this.eval(node.right, env)
 			if(ErrorObj.isError(operand)) return operand;
@@ -391,6 +392,15 @@ export class Evaluator {
 				return ErrorObj.create(`Property named "${node.property.value}" does not exist on type: ${obj.type}`, []);
 			
 			return property;
+		}
+		return NULL;
+	}
+
+	private eval_while_statement(node: WhileStatement, env: Environment): Obj{
+		let condition = this.eval(node.condition, env);
+		while(this.is_truthy(condition)){
+			this.eval(node.body, env);
+			condition = this.eval(node.condition, env);
 		}
 		return NULL;
 	}

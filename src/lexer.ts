@@ -10,6 +10,7 @@ const KEYWORDS: { [key: string]: TokenType } = {
 	"not": TokenType.NOT,
 	"if": TokenType.IF,
 	"else": TokenType.ELSE,
+	"while": TokenType.WHILE,
 	"return": TokenType.RETURN
 }
 

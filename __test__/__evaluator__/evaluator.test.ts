@@ -365,8 +365,8 @@ describe("Evaluator - Test Index Expressions", () => {
 		{input: "i = 0; [1][i];", expected: 1},
 		{input: "[1, 2, 3][1 + 1];", expected: 3}, 
 		{input: "myArray = [1, 2, 3]; myArray[0] + myArray[1] + myArray[2];", expected: 6},
-		{input: "[1, 2, 3][3]", expected: null},
-		{input: "[1, 2, 3][-1]", expected: null}
+		{input: "[1, 2, 3][3]", expected: "index out of range "},
+		{input: "[1, 2, 3][-1]", expected: "index out of range "}
 	];
  
 	tests.forEach((test) => {
@@ -376,7 +376,7 @@ describe("Evaluator - Test Index Expressions", () => {
 				expect(testIntegerObject(evaluated, Number(test.expected))).toBe(true); 
 			}
 			else {
-				expect(testNullObject(evaluated)).toBe(true);  
+				expect(testErrorObj(evaluated, test.expected)).toBe(true);  
 			}
 		});
 	});
@@ -384,7 +384,7 @@ describe("Evaluator - Test Index Expressions", () => {
 
 describe("Evaluator - Test Member Expressions", () => {
 	const tests = [
-		{input: "[1, 2, 3].push(4)", expected: [1, 2, 3, 4]},
+		{input: "arr = [1, 2, 3]; arr.push(4); arr;", expected: [1, 2, 3, 4]},
 		{input: "[1, 2, 3].filter(f(x) => x % 2 == 0)", expected: [2]},
 	];
  
@@ -420,6 +420,19 @@ describe("Parser - Assignment Expressions", () => {
  
 	tests.forEach((test) => {
 	  it(`should evaluate assignment expression with member expr: '${test.expectedValue}'`, () => {
+			const evaluated = testEval(test.input);
+			expect(testIntegerObject(evaluated, test.expectedValue)).toBe(true);  // Check if the value matches the expected value
+	  });
+	});
+});
+
+describe("Parser - While Statements", () => {
+	const tests = [
+		{ input: "x = 0; i = 0; while(i < 5) { x = x + 1; i = i + 1;}; x;", expectedIdentifier: "x", expectedValue: 5 },
+	];
+ 
+	tests.forEach((test) => {
+	  it(`should evaluate while statement: '${test.expectedValue}'`, () => {
 			const evaluated = testEval(test.input);
 			expect(testIntegerObject(evaluated, test.expectedValue)).toBe(true);  // Check if the value matches the expected value
 	  });

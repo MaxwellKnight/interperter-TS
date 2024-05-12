@@ -43,3 +43,11 @@ make_tree = f(arr) {
 
 tree = make_tree([])
 tree.set([1,2,3,4,5,6,7]);
+
+i = 1;
+T = []
+while(i <= 10) {
+	T.push(i);
+	i = i + 1;
+};
+print(T);

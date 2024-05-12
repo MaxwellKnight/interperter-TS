@@ -76,6 +76,55 @@ export class Program extends Statement{
 }
 
 /**
+ * Represents a block of statements. Often used in control structures like "if" or "while".
+ */
+export class BlockStatement extends Statement {
+	statements: Statement[];
+	constructor(token: Token){
+		super(token);
+		this.statements = [];
+	}
+
+	public stringify(level = 0): string {
+		let level_str = '';
+		for(let i = 0; i < level; i++) level_str += ' ';
+		return this.statements.map((stmnt) => `${level_str}${stmnt.stringify(level)}`).join('\n');
+	}
+}
+
+export class ReturnStatement extends Statement {
+	value: Expression | null;
+ 
+	 constructor(token: Token) {
+		 super(token); 
+		 this.value = null; 
+	 }
+ 
+	 public stringify(level = 0): string {
+		 let level_str = '';
+		 for(let i = 0; i < level + 1; i++) level_str += ' ';
+		 return this.value ? `${level_str}${this.token.literal} ${this.value.stringify(level)}` : level_str; 
+	 }
+ }
+
+export class WhileStatement extends Statement {
+	condition: Expression | null;
+	body: BlockStatement | ExpressionStatement | null;
+
+	constructor(token: Token){
+		super(token);
+		this.condition = null;
+		this.body = null;
+	}
+
+	public stringify(level: number = 0): string {
+		let level_str = '';
+		for(let i = 0; i < level + 1; i++) level_str += ' ';
+		return `${level_str}${this.condition?.stringify()} {\n ${this.body?.stringify(level + 1)}\n}`;
+	}
+}
+
+/**
  * Represents an identifier (variable name, etc.) in the AST.
  */
 export class Identifier extends Expression {
@@ -111,21 +160,6 @@ export class AssignExpression extends Expression {
 		for(let i = 0; i < level; i++) level_str += ' ';
 		let template = `${this.left.stringify(level)}`; 
 		return this.value ? `${level_str + template} = ${this.value.stringify()}` : template;
-	}
-}
-
-export class ReturnStatement extends Statement {
-  value: Expression | null;
-
-	constructor(token: Token) {
-		super(token); 
-		this.value = null; 
-	}
-
-	public stringify(level = 0): string {
-		let level_str = '';
-		for(let i = 0; i < level + 1; i++) level_str += ' ';
-		return this.value ? `${level_str}${this.token.literal} ${this.value.stringify(level)}` : level_str; 
 	}
 }
 
@@ -212,23 +246,6 @@ export class InfixExpression extends Expression {
 		let level_str = '';
 		for(let i = 0; i < level; i++) level_str += ' ';
 		return `(${this.left ? level_str + this.left.stringify() : level_str} ${this.operator} ${this.right ? this.right.stringify() : ""})`
-	}
-}
-
-/**
- * Represents a block of statements. Often used in control structures like "if" or "while".
- */
-export class BlockStatement extends Statement {
-	statements: Statement[];
-	constructor(token: Token){
-		super(token);
-		this.statements = [];
-	}
-
-	public stringify(level = 0): string {
-		let level_str = '';
-		for(let i = 0; i < level; i++) level_str += ' ';
-		return this.statements.map((stmnt) => `${level_str}${stmnt.stringify(level)}`).join('\n');
 	}
 }
 

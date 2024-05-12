@@ -36,6 +36,7 @@ export enum TokenType {
 	IF = "if",
 	ELSE = "else",
 	RETURN = "return",
+	WHILE = "while",
 	DOT = "dot",
 	COLON = "colon",
 	BANG = "bang" // `!` symbol

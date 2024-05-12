@@ -44,13 +44,14 @@ describe('Lexer', () => {
 	});
 
 	it('should tokenize keywords', () => {
-		const lexer = new Lexer("true false if else return");
+		const lexer = new Lexer("true false if else return while");
 		const expectedTokens = [
 			new Token(TokenType.TRUE, "true"),
 			new Token(TokenType.FALSE, "false"),
 			new Token(TokenType.IF, "if"),
 			new Token(TokenType.ELSE, "else"),
 			new Token(TokenType.RETURN, "return"),
+			new Token(TokenType.WHILE, "while"),
 			new Token(TokenType.EOF, "\0"),
 		];
 

@@ -1,4 +1,4 @@
-import { Enviroment } from "../../src/enviroment";
+import { Environment } from "../../src/environment";
 import { Evaluator } from "../../src/evaluator";
 import { ArrayObj, BooleanObj, ErrorObj, IntegerObj, NullObj, Obj, StringObj } from "../../src/interfaces/object";
 import { Parser } from "../../src/parser";
@@ -92,7 +92,7 @@ export function testErrorObj(obj: Obj | null, expected: string): boolean {
 export function testEval(input: string): Obj | null {
 	const parser = new Parser(input); 
 	const program = parser.parse_program();
-	const env = new Enviroment();
+	const env = new Environment();
 	checkParserErrors(parser);
 
 
