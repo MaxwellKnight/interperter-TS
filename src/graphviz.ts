@@ -3,9 +3,9 @@ import { Environment } from "./environment";
 import fs from 'fs';
 
 export const createEnvironmentDot = (environments: Environment[]) => {
-	let dot = "digraph Environment {\n";
+	let dot = 'digraph Environment {\nrankdir="BT"\n';
 
-	const envNodes = new Map();
+	const envNodes = new Map<Environment | null, string>();
 	let envCounter = 0;
 
 	const getEnvNode = (env: Environment | null) => {
@@ -42,7 +42,7 @@ export const dotToPdf = (dot: string, outputFilePath: string) => {
 	fs.writeFileSync(tempDotFilePath, dot, "utf-8");
 
 	const command = `dot -Tpdf ${tempDotFilePath} -o ${outputFilePath}`;
-	exec(command, (error, stdout, stderr) => {
+	exec(command, error => {
 		if (error) 	console.error("Error executing Graphviz command:", error);
 		else 			console.log(`PDF successfully generated at ${outputFilePath}`);
 		

@@ -41,9 +41,5 @@ make_tree = f(arr) {
 	};
 };
 
-tree = make_tree([1,2,3,4,5,6,7])
-tree.set([11,22,33,44]);
-tree.inorder();
-tree.view();
-print();
-print(tree);
+tree = make_tree([])
+tree.set([1,2,3,4,5,6,7]);
