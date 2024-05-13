@@ -1,6 +1,6 @@
 // tests/expression.test.ts
-import { Parser } from "../../src/parser";
-import { ExpressionStatement, Identifier, IntegerLiteral, PrefixExpression, InfixExpression, Expression, StringLiteral, ArrayLiteral, IndexExpression, AssignExpression } from "../../src/interfaces/nodes";
+import { Parser } from "../../parser";
+import { ExpressionStatement, Identifier, IntegerLiteral, PrefixExpression, InfixExpression, Expression, StringLiteral, ArrayLiteral, IndexExpression, AssignExpression } from "../../interfaces/nodes";
 import { checkParserErrors, testIdentifier, testInfixExpression, testLiteralExpression } from "./helper";
 
 describe("Parser - Identifier Expression", () => {

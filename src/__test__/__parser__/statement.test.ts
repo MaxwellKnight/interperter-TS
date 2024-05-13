@@ -1,5 +1,5 @@
-import { AssignExpression, BlockStatement, BooleanExpression, ExpressionStatement, Identifier, InfixExpression, WhileStatement } from "../../src/interfaces/nodes";
-import { Parser } from "../../src/parser";
+import { AssignExpression, BlockStatement, BooleanExpression, ExpressionStatement, Identifier, InfixExpression, WhileStatement } from "../../interfaces/nodes";
+import { Parser } from "../../parser";
 import { checkParserErrors, testIdentifier, testInfixExpression, testLiteralExpression } from "./helper";
 
 describe("Parser - While statements", () => {

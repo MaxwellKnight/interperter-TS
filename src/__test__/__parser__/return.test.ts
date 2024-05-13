@@ -1,5 +1,5 @@
-import { ReturnStatement, Statement } from "../../src/interfaces/nodes";
-import { Parser } from "../../src/parser";
+import { ReturnStatement, Statement } from "../../interfaces/nodes";
+import { Parser } from "../../parser";
 import { testReturnStatement } from "./helper";
  // Test case for parsing return statements
  describe("Parser - Return Statements", () => {

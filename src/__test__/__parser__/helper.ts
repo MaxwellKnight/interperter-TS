@@ -1,5 +1,5 @@
-import { BooleanExpression, Identifier, InfixExpression, IntegerLiteral, ReturnStatement, Statement } from "../../src/interfaces/nodes";
-import { Parser } from "../../src/parser";
+import { BooleanExpression, Identifier, InfixExpression, IntegerLiteral, ReturnStatement, Statement } from "../../interfaces/nodes";
+import { Parser } from "../../parser";
 
 
 export function checkParserErrors(parser: Parser) {

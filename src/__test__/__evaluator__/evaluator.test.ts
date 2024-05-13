@@ -1,5 +1,5 @@
-import { BlockStatement, ExpressionStatement, InfixExpression } from "../../src/interfaces/nodes";
-import { ArrayObj, FunctionObj, ObjectType } from "../../src/interfaces/object";
+import { BlockStatement, ExpressionStatement, InfixExpression } from "../../interfaces/nodes";
+import { ArrayObj, FunctionObj, ObjectType } from "../../interfaces/object";
 import { testInfixExpression } from "../__parser__/helper";
 import { testIntegerObject, testBooleanObject, testEval, testNullObject, testErrorObj, testStringObject, testArrayObject } from "./helper";
 

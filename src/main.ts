@@ -1,9 +1,9 @@
 import promptSync from 'prompt-sync';
-import { Parser } from './src/parser';
-import { Evaluator, envs } from './src/evaluator';
-import { Environment } from './src/environment';
+import { Parser } from './parser';
+import { Evaluator, envs } from './evaluator';
+import { Environment } from './environment';
 import fs from 'fs';
-import { dotToPdf, createEnvironmentDot } from './src/graphviz';
+import { dotToPdf, createEnvironmentDot } from './graphviz';
 
 const prompt = promptSync();
 class REPL {

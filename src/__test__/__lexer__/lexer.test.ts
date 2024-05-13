@@ -1,5 +1,5 @@
-import { Token, TokenType } from "../../src//interfaces/token";
-import { Lexer } from "../../src/lexer";
+import { Token, TokenType } from "../../interfaces/token";
+import { Lexer } from "../../lexer";
 
 describe('Lexer', () => {
 	it('should tokenize basic symbols and operators', () => {
