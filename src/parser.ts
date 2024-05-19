@@ -126,7 +126,7 @@ export class Parser {
 			return true;
 		}
 
-		this.peekError(type);
+		this.peekError([type]);
 		return false;
 	}
 
@@ -134,8 +134,8 @@ export class Parser {
 		return this.#errors;
 	}
 
-	private peekError(type: TokenType){
-		this.#errors.push(`expected ${type} but instead got ${this.#peek.literal}`)
+	private peekError(type: TokenType[]){
+		this.#errors.push(`expected ${type.map(t => t.toString()).join(", ")} but instead got ${this.#peek.literal}`)
 	}
 
 	private compare_current(type: TokenType): boolean{ 
@@ -229,7 +229,7 @@ export class Parser {
 		if(this.compare_current(TokenType.LBRACE)){
 			loop.body = this.parse_block_statement();
 			if(!this.compare_current(TokenType.RBRACE)) {
-				this.peekError(TokenType.RBRACE);
+				this.peekError([TokenType.RBRACE]);
 				return null;
 			}
 		}else loop.body = this.parse_expr_statement();
@@ -255,6 +255,17 @@ export class Parser {
 		if(!prefix) return null;
 
 		let left = prefix() as Expression;
+		if(!(this.compare_peek(TokenType.EOF) || this.compare_peek(TokenType.SEMICOLON)) && !Token.isInfix(this.#peek)){
+			this.peekError([
+									TokenType.PLUS, 
+									TokenType.MINUS, 
+									TokenType.ASTERISK, 
+									TokenType.DOUBLE_ASTERISK, 
+									TokenType.SLASH,
+									TokenType.PERCENT
+								])
+			return null;
+		}
 		while(!this.compare_current(TokenType.SEMICOLON) && precedence < this.precedence_peek()){
 			const infix = this.#infix_fns.get(this.#peek.type)?.bind(this);
 			if(!infix) return left;
@@ -494,7 +505,7 @@ export class Parser {
 
 		}
 		if(!this.compare_current(TokenType.RBRACE)) {
-			this.peekError(TokenType.RBRACE)
+			this.peekError([TokenType.RBRACE])
 			return null;
 		}
 		return obj;

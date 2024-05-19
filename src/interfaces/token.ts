@@ -3,31 +3,31 @@ export enum TokenType {
 	INT = "integer",
 	STRING = "string",
 	IDENTIFIER = "identifier",
-	ARROW = "arrow",
-	RPAREN = "rparen",
-	LPAREN = "lparen",
-	RBRACE = "rbrace",
-	LBRACE = "lbrace",
-	LBRACKET = "lbracket",
-	RBRACKET = "rbracket",
-	ASSIGN = "assign",
-	COMMA = "comma",
-	PLUS = "plus",
-	MINUS = "minus",
-	SLASH = "slash",
-	ASTERISK = "asterisk",
-	DOUBLE_ASTERISK = "double_asterisk",
-	PERCENT = "percent",
+	ARROW = "=>",
+	RPAREN = ")",
+	LPAREN = "(",
+	RBRACE = "}",
+	LBRACE = "{",
+	LBRACKET = "[",
+	RBRACKET = "]",
+	ASSIGN = "=",
+	COMMA = ",",
+	PLUS = "+",
+	MINUS = "-",
+	SLASH = "/",
+	ASTERISK = "*",
+	DOUBLE_ASTERISK = "**",
+	PERCENT = "%",
 	FUNCTION = "function",
 	EOF = "EOF",
 	ILLEGAL = "illegal",
-	SEMICOLON = "semicolon",
-	EQUALS = "EQ",
-	NOT_EQUALS = "NOT_EQUALS",
-	GT = "GT",
-	LT = "LT",
-	GTE = "GTE",
-	LTE = "LTE",
+	SEMICOLON = ";",
+	EQUALS = "==",
+	NOT_EQUALS = "!=",
+	GT = ">",
+	LT = "<",
+	GTE = ">=",
+	LTE = "<=",
 	TRUE = "true",
 	FALSE = "false",
 	AND = "and",
@@ -39,7 +39,7 @@ export enum TokenType {
 	WHILE = "while",
 	DOT = "dot",
 	COLON = "colon",
-	BANG = "bang" // `!` symbol
+	BANG = "!" // `!` symbol
 }
 
 export interface Token {
@@ -51,5 +51,20 @@ export class Token implements Token {
 	constructor(type: TokenType, literal: string){
 		this.type = type;
 		this.literal = literal;
+	}
+
+	static isInfix(token: Token){
+		const { type } = token;
+		return 	type === TokenType.PLUS ||
+					type === TokenType.MINUS||
+					type === TokenType.ASTERISK||
+					type === TokenType.SLASH||
+					type === TokenType.AND||
+					type === TokenType.OR||
+					type === TokenType.LT||
+					type === TokenType.GT||
+					type === TokenType.GTE||
+					type === TokenType.LTE||
+					type === TokenType.DOUBLE_ASTERISK;
 	}
 }
