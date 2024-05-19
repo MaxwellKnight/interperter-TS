@@ -1,2 +1,39 @@
-x = 5 6;
-x;
+make_tree = f() {
+
+	tree = [];
+
+	create_tree = f(arr) {
+		if(len(arr) == 0) return null;
+		mid = len(arr) / 2;
+
+		return {
+			value: arr[mid],
+			left: create_tree(arr.slice(0, mid)),
+			right: create_tree(arr.slice(mid + 1)),
+		};
+	};
+
+	inorder = f(root) {
+		if(root == null) return;
+		
+		inorder(root.left);
+		print(root.value);
+		inorder(root.right);
+	};
+
+	set = f(arr) {
+		tree = create_tree(arr);
+	}
+
+	return {
+		view: 		f() => print(tree),
+		inorder: 	f() => inorder(tree),
+		sum: 			f() => sum_tree(tree),
+		getRoot: 	f() => tree,
+		set: 			set
+	};
+};
+
+tree = make_tree()
+tree.set([1,2,3,4,5,6,7]);
+tree.inorder();
