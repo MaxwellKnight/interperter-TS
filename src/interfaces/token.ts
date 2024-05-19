@@ -65,6 +65,7 @@ export class Token implements Token {
 					type === TokenType.GT||
 					type === TokenType.GTE||
 					type === TokenType.LTE||
+					type === TokenType.ASSIGN||
 					type === TokenType.DOUBLE_ASTERISK;
 	}
 }

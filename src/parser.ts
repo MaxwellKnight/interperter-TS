@@ -121,7 +121,7 @@ export class Parser {
 	}
 
 	private expect(type: TokenType): boolean{
-		if(this.compare_peek(type)){
+		if(this.compare_peek([type])){
 			this.advance();
 			return true;
 		}
@@ -135,15 +135,17 @@ export class Parser {
 	}
 
 	private peekError(type: TokenType[]){
-		this.#errors.push(`expected ${type.map(t => t.toString()).join(", ")} but instead got ${this.#peek.literal}`)
+		this.#errors.push(`SyntaxError: expected ${type.map(t => t.toString()).join(", ")} but instead got ${this.#peek.literal}`)
 	}
 
 	private compare_current(type: TokenType): boolean{ 
 		return this.#current.type == type; 
 	}
 
-	private compare_peek(type: TokenType): boolean { 
-		return this.#peek.type == type; 
+	private compare_peek(tokens: TokenType[]): boolean { 
+		for(const type of tokens)
+			if(type === this.#peek.type) return true;
+		return false;
 	}
 
 	private register_prefix(type: TokenType, fn: PrefixFunction): void { 
@@ -195,7 +197,7 @@ export class Parser {
 		this.advance();
 		stmnt.value = this.parse_expr(Precedence.LOWEST);
 
-		if(this.compare_peek(TokenType.SEMICOLON))
+		if(this.compare_peek([TokenType.SEMICOLON]))
 			this.advance();
 
 		return stmnt;
@@ -207,7 +209,7 @@ export class Parser {
 
 		stmnt.value = this.parse_expr(Precedence.LOWEST);
 
-		if(this.compare_peek(TokenType.SEMICOLON))
+		if(this.compare_peek([TokenType.SEMICOLON]))
 			this.advance();
 
 		return stmnt;
@@ -234,7 +236,7 @@ export class Parser {
 			}
 		}else loop.body = this.parse_expr_statement();
 		
-		if(this.compare_peek(TokenType.SEMICOLON)) 
+		if(this.compare_peek([TokenType.SEMICOLON])) 
 			this.advance();
 
 		return loop;
@@ -244,7 +246,7 @@ export class Parser {
 		const stmnt = new ExpressionStatement(this.#current);
 		stmnt.expression = this.parse_expr(Precedence.LOWEST);
 
-		if(this.compare_peek(TokenType.SEMICOLON))
+		if(this.compare_peek([TokenType.SEMICOLON]))
 			this.advance();
 
 		return stmnt;
@@ -255,17 +257,6 @@ export class Parser {
 		if(!prefix) return null;
 
 		let left = prefix() as Expression;
-		if(!(this.compare_peek(TokenType.EOF) || this.compare_peek(TokenType.SEMICOLON)) && !Token.isInfix(this.#peek)){
-			this.peekError([
-									TokenType.PLUS, 
-									TokenType.MINUS, 
-									TokenType.ASTERISK, 
-									TokenType.DOUBLE_ASTERISK, 
-									TokenType.SLASH,
-									TokenType.PERCENT
-								])
-			return null;
-		}
 		while(!this.compare_current(TokenType.SEMICOLON) && precedence < this.precedence_peek()){
 			const infix = this.#infix_fns.get(this.#peek.type)?.bind(this);
 			if(!infix) return left;
@@ -331,7 +322,7 @@ export class Parser {
 
 		if(!this.expect(TokenType.RPAREN)) return null;
 
-		if(this.compare_peek(TokenType.LBRACE)){
+		if(this.compare_peek([TokenType.LBRACE])){
 			this.advance();
 			expr.if_case = this.parse_block_statement();
 		}else {
@@ -339,10 +330,10 @@ export class Parser {
 			expr.if_case = this.parse_statement();
 		}
 
-		if(this.compare_peek(TokenType.ELSE)){
+		if(this.compare_peek([TokenType.ELSE])){
 			this.advance();
 
-			if(this.compare_peek(TokenType.LBRACE)){
+			if(this.compare_peek([TokenType.LBRACE])){
 				this.advance();
 				expr.else_case = this.parse_block_statement();
 			}else {
@@ -373,7 +364,7 @@ export class Parser {
 
 		const parameters = this.parse_function_parameters();
 
-		if(this.compare_peek(TokenType.ARROW)){
+		if(this.compare_peek([TokenType.ARROW])){
 			this.advance();
 			this.advance();
 
@@ -392,7 +383,7 @@ export class Parser {
 
 	private parse_function_parameters(): Identifier[] | null {
 		const identifiers: Identifier[] = [];
-		if(this.compare_peek(TokenType.RPAREN)){
+		if(this.compare_peek([TokenType.RPAREN])){
 			this.advance();
 			return identifiers;
 		}
@@ -401,7 +392,7 @@ export class Parser {
 		let identifier = new Identifier(this.#current);
 		identifiers.push(identifier);
 
-		while(this.compare_peek(TokenType.COMMA)){
+		while(this.compare_peek([TokenType.COMMA])){
 			this.advance();
 			this.advance();
 			let identifier = new Identifier(this.#current);
@@ -431,7 +422,7 @@ export class Parser {
 
 	private parse_exp_list(end: TokenType): Expression[] | null{
 		const list: Expression[] = [];
-		if(this.compare_peek(end)){
+		if(this.compare_peek([end])){
 			this.advance();
 			return list;
 		}
@@ -440,7 +431,7 @@ export class Parser {
 		let elem = this.parse_expr(Precedence.LOWEST);
 		if(elem) list.push(elem);
 
-		while(this.compare_peek(TokenType.COMMA)){
+		while(this.compare_peek([TokenType.COMMA])){
 			this.advance();
 			this.advance();
 			elem = this.parse_expr(Precedence.LOWEST);
