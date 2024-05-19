@@ -3,7 +3,7 @@ import { Parser } from './parser';
 import { Evaluator, envs } from './evaluator';
 import { Environment } from './environment';
 import fs from 'fs';
-import { dotToPdf, createEnvironmentDot } from './graphviz';
+import { dot_to_pdf, create_env_dot } from './graphviz';
 
 const prompt = promptSync();
 class REPL {
@@ -62,7 +62,7 @@ class REPL {
 
 		if (fs.existsSync(fileName)) {
 			repl.runFromFile(fileName);
-			if(args[1] && args[1] === '-d') dotToPdf(createEnvironmentDot(envs), "dot.pdf")
+			if(args[1] && args[1] === '-d') dot_to_pdf(create_env_dot(envs), "dot.pdf")
 			return;
 		}
 		console.error(`File not found: ${fileName}\n`);

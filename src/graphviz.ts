@@ -2,7 +2,7 @@ import { exec } from "child_process";
 import { Environment } from "./environment";
 import fs from 'fs';
 
-export const createEnvironmentDot = (environments: Environment[]) => {
+export const create_env_dot = (environments: Environment[]) => {
 	let dot = 'digraph Environment {\nrankdir="BT"\n';
 
 	const envNodes = new Map<Environment | null, string>();
@@ -37,7 +37,7 @@ export const createEnvironmentDot = (environments: Environment[]) => {
 };
 
 
-export const dotToPdf = (dot: string, outputFilePath: string) => {
+export const dot_to_pdf = (dot: string, outputFilePath: string) => {
 	const tempDotFilePath = "temp_dot_file.dot";
 	fs.writeFileSync(tempDotFilePath, dot, "utf-8");
 
