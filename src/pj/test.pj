@@ -28,8 +28,6 @@ make_tree = f() {
 	return {
 		view: 		f() => print(tree),
 		inorder: 	f() => inorder(tree),
-		sum: 			f() => sum_tree(tree),
-		getRoot: 	f() => tree,
 		set: 			set
 	};
 };
