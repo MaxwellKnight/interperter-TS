@@ -65,6 +65,7 @@ export class StringObj extends Obj {
 		this.value = value;
 		this.properties.set('split', StringObj.split);
 		this.properties.set('strip', StringObj.strip);
+		this.properties.set('try_parse', StringObj.try_parse);
 	}
 
 	static strip(self: Obj, ...args: Obj[]): Obj {
@@ -89,6 +90,20 @@ export class StringObj extends Obj {
 		}
 		const values = self.value.split(args[0].value).map(v => new StringObj(v));
 		return new ArrayObj(values);
+	}
+
+	static try_parse(self: Obj, ...args: Obj[]): Obj {
+		if (!(self instanceof StringObj)) {
+			return ErrorObj.create("first argument to `try_parse` must be of type `string`, got: ", [self.type]);
+		}
+		if (args.length != 0) {
+			return ErrorObj.create("Invalid argument count `split` takes 0, got:", [String(args.length)]);
+		}
+		if (isNaN(Number(self.value))) {
+			return ErrorObj.create("Cannot parse to a number, value contains non number values: ", [self.value]);
+		}
+
+		return new IntegerObj(Number(self.value));
 	}
 
 	public stringify(): string { return `'${this.value}'`; }
