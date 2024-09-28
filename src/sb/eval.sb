@@ -41,13 +41,12 @@ parse_multiplicative = f(tokens) {
 }
 
 parse_atomic = f(tokens) {
-    num = "";
-
     if(tokens[0] == "("){
         tokens.dequeue();
         return parse_additive(tokens);
     }
 
+    num = "";
     while(len(tokens) > 0){
         if(!tokens[0].is_numeric()) {
             break;
