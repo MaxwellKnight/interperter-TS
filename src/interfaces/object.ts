@@ -7,6 +7,7 @@ export enum ObjectType {
 	STRING_OBJ = "string",
 	BOOLEAN_OBJ = "boolean",
 	RETURN_OBJ = "return",
+	BREAK_OBJ = "break",
 	FUNCTION_OBJ = "function",
 	ARRAY_OBJ = "array",
 	OBJECT_OBJ = "object",
@@ -66,6 +67,7 @@ export class StringObj extends Obj {
 		this.properties.set('split', StringObj.split);
 		this.properties.set('strip', StringObj.strip);
 		this.properties.set('try_parse', StringObj.try_parse);
+		this.properties.set('is_numeric', StringObj.is_numeric);
 	}
 
 	static strip(self: Obj, ...args: Obj[]): Obj {
@@ -97,13 +99,27 @@ export class StringObj extends Obj {
 			return ErrorObj.create("first argument to `try_parse` must be of type `string`, got: ", [self.type]);
 		}
 		if (args.length != 0) {
-			return ErrorObj.create("Invalid argument count `split` takes 0, got:", [String(args.length)]);
+			return ErrorObj.create("Invalid argument count `is_numeric` takes 0, got:", [String(args.length)]);
 		}
 		if (isNaN(Number(self.value))) {
 			return ErrorObj.create("Cannot parse to a number, value contains non number values: ", [self.value]);
 		}
 
 		return new IntegerObj(Number(self.value));
+	}
+
+	static is_numeric(self: Obj, ...args: Obj[]): Obj {
+		if (!(self instanceof StringObj)) {
+			return ErrorObj.create("first argument to `is_numeric` must be of type `string`, got: ", [self.type]);
+		}
+		if (args.length != 0) {
+			return ErrorObj.create("Invalid argument count `is_numeric` takes 0, got:", [String(args.length)]);
+		}
+		if (isNaN(Number(self.value))) {
+			return new BooleanObj(false);
+		}
+
+		return new BooleanObj(true);
 	}
 
 	public stringify(): string { return `'${this.value}'`; }
@@ -127,6 +143,14 @@ export class ReturnObj extends Obj {
 	}
 
 	public stringify(): string { return `return ${this.value.stringify()}`; }
+}
+
+export class BreakObj extends Obj {
+	constructor() {
+		super(ObjectType.BREAK_OBJ);
+	}
+
+	public stringify(): string { return `break`; }
 }
 
 export class NullObj extends Obj {

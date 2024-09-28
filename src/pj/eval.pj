@@ -1,0 +1,63 @@
+parse_additive = f(tokens) {
+    left = parse_multiplicative(tokens);
+
+    while(len(tokens) > 0) {
+        if(tokens[0] == ")"){
+            tokens.dequeue();
+            break;
+        }
+
+        token = tokens.dequeue();
+        right = parse_multiplicative(tokens);
+
+        if(token == "+"){
+            left = left + right;
+        } else {
+            left = left - right;
+        }
+    }
+
+    return left;
+}
+
+parse_multiplicative = f(tokens) {
+    left = parse_atomic(tokens);
+
+    while(len(tokens) > 0){
+        if((tokens[0] == "+") or (tokens[0] == "-") or (tokens[0] == ")")) {
+            break;
+        }
+
+        token = tokens.dequeue();
+        right = parse_atomic(tokens);
+        if(token == "*"){
+            left = left * right;
+        } else {
+            left = left / right;
+        }
+    }
+
+    return left;
+}
+
+parse_atomic = f(tokens) {
+    num = "";
+
+    if(tokens[0] == "("){
+        tokens.dequeue();
+        return parse_additive(tokens);
+    }
+
+    while(len(tokens) > 0){
+        if(!tokens[0].is_numeric()) {
+            break;
+        }
+        num = num + tokens.dequeue();
+    }
+
+    return num.try_parse();
+}
+
+
+eval = f(expr) => parse_additive(expr.strip().split(""))
+print("Result:", eval("(3 + 2) * (5 - 1)"));

@@ -11,6 +11,7 @@ const KEYWORDS: { [key: string]: TokenType } = {
 	"if": TokenType.IF,
 	"else": TokenType.ELSE,
 	"while": TokenType.WHILE,
+	"break": TokenType.BREAK,
 	"return": TokenType.RETURN
 }
 

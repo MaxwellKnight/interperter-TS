@@ -1,6 +1,6 @@
 import { Environment, builtin_first, builtin_last, builtin_len, builtin_print, builtin_rest } from "./environment";
-import { ArrayLiteral, ArrowFunctionLiteral, AssignExpression, BlockStatement, BooleanExpression, CallExpression, Expression, ExpressionStatement, FunctionLiteral, Identifier, IfExpression, IndexExpression, InfixExpression, IntegerLiteral, MemberExpression, Node, ObjectLiteral, PrefixExpression, Program, ReturnStatement, Statement, StringLiteral, WhileStatement } from "./interfaces/nodes";
-import { ArrayObj, BooleanObj, BuiltinObj, ErrorObj, FALSE, FunctionObj, IntegerObj, NULL, NullObj, Obj, ObjectObj, ObjectType, ReturnObj, StringObj, TRUE } from "./interfaces/object";
+import { ArrayLiteral, ArrowFunctionLiteral, AssignExpression, BlockStatement, BooleanExpression, BreakStatement, CallExpression, Expression, ExpressionStatement, FunctionLiteral, Identifier, IfExpression, IndexExpression, InfixExpression, IntegerLiteral, MemberExpression, Node, ObjectLiteral, PrefixExpression, Program, ReturnStatement, Statement, StringLiteral, WhileStatement } from "./interfaces/nodes";
+import { ArrayObj, BooleanObj, BreakObj, BuiltinObj, ErrorObj, FALSE, FunctionObj, IntegerObj, NULL, NullObj, Obj, ObjectObj, ObjectType, ReturnObj, StringObj, TRUE } from "./interfaces/object";
 
 export const envs: Environment[] = [];
 
@@ -54,6 +54,9 @@ export class Evaluator {
 			if (ErrorObj.isError(returnValue)) return returnValue;
 
 			if (returnValue) return new ReturnObj(returnValue);
+		}
+		else if (node instanceof BreakStatement) {
+			return new BreakObj();
 		}
 		else if (node instanceof Identifier) {
 			return this.eval_identifier(node, env);
@@ -143,7 +146,7 @@ export class Evaluator {
 
 		for (const statement of node.statements) {
 			result = this.eval(statement, env)
-			if (result instanceof ReturnObj || result instanceof ErrorObj)
+			if (result instanceof ReturnObj || result instanceof ErrorObj || result instanceof BreakObj)
 				return result;
 		}
 		return result;
@@ -399,7 +402,10 @@ export class Evaluator {
 	private eval_while_statement(node: WhileStatement, env: Environment): Obj {
 		let condition = this.eval(node.condition, env);
 		while (this.is_truthy(condition)) {
-			this.eval(node.body, env);
+			let returned = this.eval(node.body, env);
+			if (returned instanceof BreakObj) {
+				break;
+			}
 			condition = this.eval(node.condition, env);
 		}
 		return NULL;

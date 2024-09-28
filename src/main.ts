@@ -54,8 +54,7 @@ class REPL {
 }
 
 (async () => {
-	// Get command-line arguments
-	const args = process.argv.slice(2); // Skip the first two (node and script name)
+	const args = process.argv.slice(2);
 	const repl = new REPL();
 	if (args.length > 0) {
 		const fileName = args[0];
@@ -67,6 +66,6 @@ class REPL {
 		}
 		console.error(`File not found: ${fileName}\n`);
 	}
-	// No arguments provided, run the interactive REPL
+
 	repl.run();
 })();

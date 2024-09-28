@@ -1,26 +1,27 @@
-import { 
+import {
 	ArrayLiteral,
 	ArrowFunctionLiteral,
-	BlockStatement, 
-	BooleanExpression, 
-	CallExpression, 
+	BlockStatement,
+	BooleanExpression,
+	CallExpression,
 	AssignExpression,
-	Expression, 
-	ExpressionStatement, 
-	FunctionLiteral, 
-	Identifier, 
-	IfExpression, 
-	IndexExpression, 
-	InfixExpression, 
-	IntegerLiteral, 
-	MemberExpression, 
-	ObjectLiteral, 
-	PrefixExpression, 
-	Program, 
-	ReturnStatement, 
-	Statement, 
+	Expression,
+	ExpressionStatement,
+	FunctionLiteral,
+	Identifier,
+	IfExpression,
+	IndexExpression,
+	InfixExpression,
+	IntegerLiteral,
+	MemberExpression,
+	ObjectLiteral,
+	PrefixExpression,
+	Program,
+	ReturnStatement,
+	Statement,
 	StringLiteral,
-	WhileStatement
+	WhileStatement,
+	BreakStatement
 } from "./interfaces/nodes";
 import { Token, TokenType } from "./interfaces/token";
 import { Lexer } from "./lexer";
@@ -41,7 +42,7 @@ enum Precedence {
 // { key, } | { key } | { key1: value1, key2: value2, ...}
 const PRECEDENCES = new Map<TokenType, Precedence>();
 PRECEDENCES.set(TokenType.AND, Precedence.LOGICAL);
-PRECEDENCES.set(TokenType.OR, Precedence.LOGICAL);	
+PRECEDENCES.set(TokenType.OR, Precedence.LOGICAL);
 PRECEDENCES.set(TokenType.EQUALS, Precedence.EQAULS);
 PRECEDENCES.set(TokenType.NOT_EQUALS, Precedence.EQAULS);
 PRECEDENCES.set(TokenType.LT, Precedence.LESSGREATER);
@@ -70,11 +71,11 @@ export class Parser {
 	#prefix_fns: Map<TokenType, PrefixFunction>
 	#infix_fns: Map<TokenType, InfixFunction>
 
-	constructor(source: string){
+	constructor(source: string) {
 		this.#lexer = new Lexer(source);
 		this.#current = new Token(TokenType.EOF, TokenType.EOF);
 		this.#peek = new Token(TokenType.EOF, TokenType.EOF);
-		this.#errors =[];
+		this.#errors = [];
 		this.advance();
 		this.advance();
 
@@ -93,7 +94,7 @@ export class Parser {
 		this.register_prefix(TokenType.TRUE, this.parse_boolean);
 		this.register_prefix(TokenType.FALSE, this.parse_boolean);
 		this.register_prefix(TokenType.LBRACE, this.parse_object_literal_expr);
-		
+
 		this.register_infix(TokenType.LBRACKET, this.parse_index_expr);
 		this.register_infix(TokenType.LPAREN, this.parse_call_expr);
 		this.register_infix(TokenType.DOT, this.parse_member_expr);
@@ -114,14 +115,14 @@ export class Parser {
 		this.register_infix(TokenType.ASSIGN, this.parse_assignment_expr);
 	}
 
-	private advance(): void{
-		if(this.#peek)
+	private advance(): void {
+		if (this.#peek)
 			this.#current = this.#peek;
 		this.#peek = this.#lexer.next();
 	}
 
-	private expect(type: TokenType): boolean{
-		if(this.compare_peek([type])){
+	private expect(type: TokenType): boolean {
+		if (this.compare_peek([type])) {
 			this.advance();
 			return true;
 		}
@@ -134,82 +135,93 @@ export class Parser {
 		return this.#errors;
 	}
 
-	private peekError(type: TokenType[]){
+	private peekError(type: TokenType[]) {
 		this.#errors.push(`SyntaxError: expected ${type.map(t => t.toString()).join(", ")} but instead got ${this.#peek.literal}`)
 	}
 
-	private compare_current(type: TokenType): boolean{ 
-		return this.#current.type == type; 
+	private compare_current(type: TokenType): boolean {
+		return this.#current.type == type;
 	}
 
-	private compare_peek(tokens: TokenType[]): boolean { 
-		for(const type of tokens)
-			if(type === this.#peek.type) return true;
+	private compare_peek(tokens: TokenType[]): boolean {
+		for (const type of tokens)
+			if (type === this.#peek.type) return true;
 		return false;
 	}
 
-	private register_prefix(type: TokenType, fn: PrefixFunction): void { 
-		this.#prefix_fns.set(type, fn); 
+	private register_prefix(type: TokenType, fn: PrefixFunction): void {
+		this.#prefix_fns.set(type, fn);
 	}
 
-	private register_infix(type: TokenType, fn: InfixFunction){ 
-		this.#infix_fns.set(type, fn); 
+	private register_infix(type: TokenType, fn: InfixFunction) {
+		this.#infix_fns.set(type, fn);
 	}
 
-	private precedence_current(): Precedence { 
-		return PRECEDENCES.get(this.#current.type) || Precedence.LOWEST; 
+	private precedence_current(): Precedence {
+		return PRECEDENCES.get(this.#current.type) || Precedence.LOWEST;
 	}
 
-	private precedence_peek(): Precedence { 
-		return PRECEDENCES.get(this.#peek.type) || Precedence.LOWEST; 
+	private precedence_peek(): Precedence {
+		return PRECEDENCES.get(this.#peek.type) || Precedence.LOWEST;
 	}
-	
-	private no_prefix_error(token: Token): void { 
-		this.#errors.push(`Could not find prefix function for ${token.type}`); 
+
+	private no_prefix_error(token: Token): void {
+		this.#errors.push(`Could not find prefix function for ${token.type}`);
 	}
 
 	public parse_program(): Program {
 		const program = new Program();
 
-		while(!this.#lexer.isEOF()){
+		while (!this.#lexer.isEOF()) {
 			const stmnt = this.parse_statement();
-			if(stmnt !== null) program.statements.push(stmnt);
+			if (stmnt !== null) program.statements.push(stmnt);
 			this.advance();
 		}
 
 		return program;
 	}
 
-	private parse_statement(): Statement | null{
-		switch(this.#current.type){
+	private parse_statement(): Statement | null {
+		switch (this.#current.type) {
 			case TokenType.RETURN:
 				return this.parse_return_statement();
 			case TokenType.WHILE:
 				return this.parse_while_loop();
+			case TokenType.BREAK:
+				return this.parse_break_statement();
 			default:
 				return this.parse_expr_statement();
 		}
 	}
 
-	private parse_assignment_expr(left: Expression): Statement | null{
+	private parse_assignment_expr(left: Expression): Statement | null {
 		const stmnt = new AssignExpression(this.#current, left);
 
 		this.advance();
 		stmnt.value = this.parse_expr(Precedence.LOWEST);
 
-		if(this.compare_peek([TokenType.SEMICOLON]))
+		if (this.compare_peek([TokenType.SEMICOLON]))
 			this.advance();
 
 		return stmnt;
 	}
 
-	private parse_return_statement(): Statement{
+	private parse_return_statement(): Statement {
 		const stmnt = new ReturnStatement(this.#current);
 		this.advance();
 
 		stmnt.value = this.parse_expr(Precedence.LOWEST);
 
-		if(this.compare_peek([TokenType.SEMICOLON]))
+		if (this.compare_peek([TokenType.SEMICOLON]))
+			this.advance();
+
+		return stmnt;
+	}
+
+	private parse_break_statement(): Statement {
+		const stmnt = new BreakStatement(this.#current);
+
+		if (this.compare_peek([TokenType.SEMICOLON]))
 			this.advance();
 
 		return stmnt;
@@ -217,26 +229,26 @@ export class Parser {
 
 	private parse_while_loop(): Statement | null {
 		const loop = new WhileStatement(this.#current);
-		if(!this.expect(TokenType.LPAREN)) return null;
+		if (!this.expect(TokenType.LPAREN)) return null;
 		this.advance();
 
 		const condition = this.parse_expr(Precedence.LOWEST);
-		if(!condition) return null;
+		if (!condition) return null;
 		loop.condition = condition;
 
-		if(!this.expect(TokenType.RPAREN)) return null;
+		if (!this.expect(TokenType.RPAREN)) return null;
 
 		this.advance();
 
-		if(this.compare_current(TokenType.LBRACE)){
+		if (this.compare_current(TokenType.LBRACE)) {
 			loop.body = this.parse_block_statement();
-			if(!this.compare_current(TokenType.RBRACE)) {
+			if (!this.compare_current(TokenType.RBRACE)) {
 				this.peekError([TokenType.RBRACE]);
 				return null;
 			}
-		}else loop.body = this.parse_expr_statement();
-		
-		if(this.compare_peek([TokenType.SEMICOLON])) 
+		} else loop.body = this.parse_expr_statement();
+
+		if (this.compare_peek([TokenType.SEMICOLON]))
 			this.advance();
 
 		return loop;
@@ -246,7 +258,7 @@ export class Parser {
 		const stmnt = new ExpressionStatement(this.#current);
 		stmnt.expression = this.parse_expr(Precedence.LOWEST);
 
-		if(this.compare_peek([TokenType.SEMICOLON]))
+		if (this.compare_peek([TokenType.SEMICOLON]))
 			this.advance();
 
 		return stmnt;
@@ -254,13 +266,13 @@ export class Parser {
 
 	private parse_expr(precedence: Precedence): Expression | null {
 		const prefix = this.#prefix_fns.get(this.#current.type)?.bind(this);
-		if(!prefix) return null;
+		if (!prefix) return null;
 
 		let left = prefix() as Expression;
-		while(!this.compare_current(TokenType.SEMICOLON) && precedence < this.precedence_peek()){
+		while (!this.compare_current(TokenType.SEMICOLON) && precedence < this.precedence_peek()) {
 			const infix = this.#infix_fns.get(this.#peek.type)?.bind(this);
-			if(!infix) return left;
-			
+			if (!infix) return left;
+
 			this.advance();
 			left = infix(left) as Expression;
 		}
@@ -270,15 +282,15 @@ export class Parser {
 
 	private parse_identifier(): Expression { return new Identifier(this.#current); }
 	private parse_boolean(): Expression { return new BooleanExpression(this.#current, this.compare_current(TokenType.TRUE)); }
-	private parse_string(): Expression { 
-		const str = new  StringLiteral(this.#current);
+	private parse_string(): Expression {
+		const str = new StringLiteral(this.#current);
 		str.value = this.#current.literal;
-		return str; 
+		return str;
 	}
 
 	private parse_integer(): Expression | null {
 		const integer = new IntegerLiteral(this.#current);
-		if(Number.isNaN(this.#current.literal)){
+		if (Number.isNaN(this.#current.literal)) {
 			this.no_prefix_error(this.#current);
 			return null;
 		}
@@ -306,7 +318,7 @@ export class Parser {
 
 		const expr = this.parse_expr(Precedence.LOWEST);
 
-		if(!this.expect(TokenType.RPAREN))
+		if (!this.expect(TokenType.RPAREN))
 			return null;
 
 		return expr;
@@ -315,28 +327,28 @@ export class Parser {
 	private parse_if_expr(): Expression | null {
 		const expr = new IfExpression(this.#current);
 
-		if(!this.expect(TokenType.LPAREN)) return null;
+		if (!this.expect(TokenType.LPAREN)) return null;
 
 		this.advance();
 		expr.condition = this.parse_expr(Precedence.LOWEST);
 
-		if(!this.expect(TokenType.RPAREN)) return null;
+		if (!this.expect(TokenType.RPAREN)) return null;
 
-		if(this.compare_peek([TokenType.LBRACE])){
+		if (this.compare_peek([TokenType.LBRACE])) {
 			this.advance();
 			expr.if_case = this.parse_block_statement();
-		}else {
+		} else {
 			this.advance();
 			expr.if_case = this.parse_statement();
 		}
 
-		if(this.compare_peek([TokenType.ELSE])){
+		if (this.compare_peek([TokenType.ELSE])) {
 			this.advance();
 
-			if(this.compare_peek([TokenType.LBRACE])){
+			if (this.compare_peek([TokenType.LBRACE])) {
 				this.advance();
 				expr.else_case = this.parse_block_statement();
-			}else {
+			} else {
 				this.advance();
 				expr.else_case = this.parse_statement();
 			}
@@ -349,9 +361,9 @@ export class Parser {
 		const block = new BlockStatement(this.#current);
 
 		this.advance();
-		while(!this.compare_current(TokenType.RBRACE) && !this.compare_current(TokenType.EOF)){
+		while (!this.compare_current(TokenType.RBRACE) && !this.compare_current(TokenType.EOF)) {
 			const statement = this.parse_statement();
-			if(statement) block.statements.push(statement);
+			if (statement) block.statements.push(statement);
 			this.advance();
 		}
 		return block;
@@ -360,11 +372,11 @@ export class Parser {
 	private parse_function_literal(): Expression | null {
 		let fn: ArrowFunctionLiteral | FunctionLiteral = new FunctionLiteral(this.#current);
 
-		if(!this.expect(TokenType.LPAREN)) return null;
+		if (!this.expect(TokenType.LPAREN)) return null;
 
 		const parameters = this.parse_function_parameters();
 
-		if(this.compare_peek([TokenType.ARROW])){
+		if (this.compare_peek([TokenType.ARROW])) {
 			this.advance();
 			this.advance();
 
@@ -374,7 +386,7 @@ export class Parser {
 			return fn;
 		}
 
-		if(!this.expect(TokenType.LBRACE)) return null;
+		if (!this.expect(TokenType.LBRACE)) return null;
 
 		fn.parameters = parameters;
 		fn.body = this.parse_block_statement();
@@ -383,7 +395,7 @@ export class Parser {
 
 	private parse_function_parameters(): Identifier[] | null {
 		const identifiers: Identifier[] = [];
-		if(this.compare_peek([TokenType.RPAREN])){
+		if (this.compare_peek([TokenType.RPAREN])) {
 			this.advance();
 			return identifiers;
 		}
@@ -392,14 +404,14 @@ export class Parser {
 		let identifier = new Identifier(this.#current);
 		identifiers.push(identifier);
 
-		while(this.compare_peek([TokenType.COMMA])){
+		while (this.compare_peek([TokenType.COMMA])) {
 			this.advance();
 			this.advance();
 			let identifier = new Identifier(this.#current);
 			identifiers.push(identifier);
 		}
 
-		if(!this.expect(TokenType.RPAREN)) return null;
+		if (!this.expect(TokenType.RPAREN)) return null;
 		return identifiers;
 	}
 
@@ -414,31 +426,31 @@ export class Parser {
 		const array = new ArrayLiteral(this.#current);
 
 		const elems = this.parse_exp_list(TokenType.RBRACKET);
-		if(!elems) return null;
-		
+		if (!elems) return null;
+
 		array.elements = elems;
 		return array;
 	}
 
-	private parse_exp_list(end: TokenType): Expression[] | null{
+	private parse_exp_list(end: TokenType): Expression[] | null {
 		const list: Expression[] = [];
-		if(this.compare_peek([end])){
+		if (this.compare_peek([end])) {
 			this.advance();
 			return list;
 		}
 
 		this.advance();
 		let elem = this.parse_expr(Precedence.LOWEST);
-		if(elem) list.push(elem);
+		if (elem) list.push(elem);
 
-		while(this.compare_peek([TokenType.COMMA])){
+		while (this.compare_peek([TokenType.COMMA])) {
 			this.advance();
 			this.advance();
 			elem = this.parse_expr(Precedence.LOWEST);
-			if(elem) list.push(elem);
+			if (elem) list.push(elem);
 		}
-		
-		if(!this.expect(end)) return null;
+
+		if (!this.expect(end)) return null;
 
 		return list;
 	}
@@ -448,11 +460,11 @@ export class Parser {
 
 		this.advance();
 		const expr = this.parse_expr(Precedence.LOWEST);
-		if(!expr) return null;
+		if (!expr) return null;
 
 		index.index = expr;
 
-		if(!this.expect(TokenType.RBRACKET)) return null;
+		if (!this.expect(TokenType.RBRACKET)) return null;
 
 		return index;
 	}
@@ -460,7 +472,7 @@ export class Parser {
 	private parse_member_expr(left: Expression): Expression | null {
 		const memeber = new MemberExpression(this.#current, left);
 
-		if(!this.expect(TokenType.IDENTIFIER)) return null;
+		if (!this.expect(TokenType.IDENTIFIER)) return null;
 
 		memeber.property = this.parse_expr(Precedence.MEMBER);
 		return memeber;
@@ -469,33 +481,33 @@ export class Parser {
 	private parse_object_literal_expr(): Expression | null {
 		const obj = new ObjectLiteral(this.#current);
 		this.advance();
-		
-		if(this.compare_current(TokenType.RBRACE)) return obj;
-		
-		while(!this.compare_current(TokenType.EOF) && !this.compare_current(TokenType.RBRACE)){
+
+		if (this.compare_current(TokenType.RBRACE)) return obj;
+
+		while (!this.compare_current(TokenType.EOF) && !this.compare_current(TokenType.RBRACE)) {
 			const key = this.parse_expr(Precedence.LOWEST);
-			if(!key) return null;
+			if (!key) return null;
 			this.advance();
-			
-			if(this.compare_current(TokenType.COMMA)){
+
+			if (this.compare_current(TokenType.COMMA)) {
 				this.advance();
 				obj.properties.set(key, null)
 				continue;
 			}
-			else if(this.compare_current(TokenType.COLON)){
+			else if (this.compare_current(TokenType.COLON)) {
 				this.advance();
 
 				const value = this.parse_expr(Precedence.LOWEST);
-				if(!value) return null;
+				if (!value) return null;
 				obj.properties.set(key, value);
 				this.advance();
-				if(this.compare_current(TokenType.COMMA)){
+				if (this.compare_current(TokenType.COMMA)) {
 					this.advance();
 				}
 			}
 
 		}
-		if(!this.compare_current(TokenType.RBRACE)) {
+		if (!this.compare_current(TokenType.RBRACE)) {
 			this.peekError([TokenType.RBRACE])
 			return null;
 		}

@@ -37,6 +37,7 @@ export enum TokenType {
 	ELSE = "else",
 	RETURN = "return",
 	WHILE = "while",
+	BREAK = "break",
 	DOT = "dot",
 	COLON = "colon",
 	BANG = "!" // `!` symbol
@@ -48,24 +49,24 @@ export interface Token {
 }
 
 export class Token implements Token {
-	constructor(type: TokenType, literal: string){
+	constructor(type: TokenType, literal: string) {
 		this.type = type;
 		this.literal = literal;
 	}
 
-	static isInfix(token: Token){
+	static isInfix(token: Token) {
 		const { type } = token;
-		return 	type === TokenType.PLUS ||
-					type === TokenType.MINUS||
-					type === TokenType.ASTERISK||
-					type === TokenType.SLASH||
-					type === TokenType.AND||
-					type === TokenType.OR||
-					type === TokenType.LT||
-					type === TokenType.GT||
-					type === TokenType.GTE||
-					type === TokenType.LTE||
-					type === TokenType.ASSIGN||
-					type === TokenType.DOUBLE_ASTERISK;
+		return type === TokenType.PLUS ||
+			type === TokenType.MINUS ||
+			type === TokenType.ASTERISK ||
+			type === TokenType.SLASH ||
+			type === TokenType.AND ||
+			type === TokenType.OR ||
+			type === TokenType.LT ||
+			type === TokenType.GT ||
+			type === TokenType.GTE ||
+			type === TokenType.LTE ||
+			type === TokenType.ASSIGN ||
+			type === TokenType.DOUBLE_ASTERISK;
 	}
 }
