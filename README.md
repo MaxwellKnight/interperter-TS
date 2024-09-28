@@ -1,353 +1,254 @@
-# Custom Language Documentation
+# Custom Language Interpreter
 
 ## Table of Contents
 
 - [Overview](#overview)
-- [Why](#why)
+- [Features](#features)
+  - [Data Types](#data-types)
+  - [Operators](#operators)
+  - [Control Flow](#control-flow)
+  - [Functions](#functions)
+  - [Built-in Functions](#built-in-functions)
+  - [Object Methods](#object-methods)
 - [Installation](#installation)
-- [Data Types](#data-types)
-- [Operators](#operators)
-- [Expressions](#expressions)
-  - [Infix Expressions](#infix-expressions)
-  - [Prefix Expressions](#prefix-expressions)
-- [Statements](#statements)
-  - [Expression Statements](#expression-statements)
-  - [Assignment Statements](#assignment-statements)
-  - [Return Statements](#return-statements)
-- [Control Flow](#control-flow)
-  - [If Statements](#if-statements)
-  - [Loops](#loops)
-- [Functions](#functions)
-- [Objects and Arrays](#objects-and-arrays)
-  - [Objects](#objects)
-  - [Arrays](#arrays)
-- [Built-in Functions](#built-in-functions)
+- [Usage](#usage)
+- [Language Syntax](#language-syntax)
 - [Architecture](#architecture)
-- [Using the Language](#using-the-language)
-- [Example: Creating a Binary Search Tree](#example-creating-a-binary-search-tree)
+- [Tutorial](#tutorial)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Overview
 
-The custom language is a dynamically typed language designed to evaluate scripts and custom code. It supports various features like functions, control flow, recursion, arrays, objects, and built-in operations.
+This project implements a custom programming language interpreter written in TypeScript. It includes a lexer for tokenizing the source code and a parser for creating an Abstract Syntax Tree (AST). The interpreter supports various features such as functions, control flow, recursion, arrays, objects, and built-in operations.
 
-## Why
+## Features
 
-The courses I took on automata, formal languages, and principles of programming provided the theoretical foundation for my project. Studying topics such as lexical scoping, formal languages, Grammar rules and programming principles sparked my interest in understanding how programming languages function. By bridging theory with practical application, I aimed to deepen my understanding and explore the inner workings of programming languages. These courses fueled my passion for software development and motivated me to delve beyond theoretical concepts into hands-on implementation.
+### Data Types
+
+- Integer
+- String
+- Boolean
+- Array
+- Object
+- Function
+- Null
+
+### Operators
+
+- Arithmetic: `+`, `-`, `*`, `/`, `%`, `**` (exponentiation)
+- Comparison: `==`, `!=`, `<`, `<=`, `>`, `>=`
+- Logical: `and`, `or`, `!` (not)
+- Assignment: `=`
+- Member access: `.`
+- Index access: `[]`
+
+### Control Flow
+
+- If-else statements
+- While loops
+- Break statements
+
+### Functions
+
+- Regular function definition
+- Arrow function definition
+- Anonymous functions
+- Recursion
+- Closures
+- Higher-order functions
+
+### Built-in Functions
+
+- `len(iterable)`: Returns the length of an array or string
+- `first(array)`: Returns the first element of an array
+- `rest(array)`: Returns all elements of an array except the first
+- `print(value)`: Outputs text to the console
+
+### Object Methods
+
+#### String Methods
+
+- `split(delimiter)`: Splits the string by the given delimiter and returns an array of substrings.
+- `strip()`: Removes all whitespace from the string.
+- `into_int()`: Converts the string to an integer if possible.
+- `is_numeric()`: Returns a boolean indicating whether the string can be parsed as a number.
+
+#### Array Methods
+
+- `push(element)`: Adds an element to the end of the array.
+- `pop()`: Removes and returns the last element of the array.
+- `dequeue()`: Removes and returns the first element of the array.
+- `filter(function)`: Creates a new array with all elements that pass the test implemented by the provided function.
+- `map(function)`: Creates a new array with the results of calling a provided function on every element in this array.
+- `reduce(function, [initial_value])`: Executes a reducer function on each element of the array, resulting in a single output value.
+- `slice([start], [end])`: Returns a shallow copy of a portion of an array into a new array object.
+
+#### Object Methods
+
+Objects in this language are flexible and can have custom methods defined. The built-in methods for objects are primarily related to property access and modification.
 
 ## Installation
 
 To install the project, follow these steps:
 
-1. Clone the Repository: Begin by cloning the repository to your local machine using the git clone command.
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/MaxwellKnight/interperter-TS
+   ```
 
-```bash
-git clone https://github.com/MaxwellKnight/interperter-TS
-```
+2. Navigate to the project directory:
+   ```bash
+   cd interperter-TS
+   ```
 
-2. Navigate to the Project Directory: Move into the project directory using the cd command.
+3. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-```bash
-cd interperter-TS
-```
+4. Build the project:
+   ```bash
+   npm run build
+   ```
 
-3. Install Dependencies: Use npm (Node Package Manager) to install the project dependencies defined in the package.json file.
+5. Start the project:
+   ```bash
+   npm start
+   ```
 
-```bash
-npm install
-```
+## Usage
 
-4. Build the Project: Run the TypeScript compiler to transpile the TypeScript files into JavaScript.
+After starting the project, you can input your code in the custom language. The interpreter will tokenize, parse, and execute the code, providing the output or any error messages.
 
-```bash
-npm run build
-```
+## Language Syntax
 
-Start the Project: After building the project, you can run it using the start command defined in the package.json file.
+The custom language supports the following syntax:
 
-```bash
-npm start
-```
+```plaintext
+# Variables
+x = 5
 
-## Data Types
-
-The language supports the following data types:
-
-- **Integer**: Represents whole numbers. Example: `1`, `-5`, `42`.
-- **String**: Represents text enclosed in double quotes. Example: `"hello"`, `"world"`.
-- **Boolean**: Represents `true` or `false`.
-- **Array**: A collection of elements, enclosed in square brackets. Example: `[1, 2, 3]`.
-- **Object**: A collection of key-value pairs, enclosed in curly braces. Example: `{ "key": "value" }`.
-- **Function**: Represents a block of code that can be executed with parameters.
-- **Null**: Represents the absence of a value.
-
-## Operators
-
-The language supports a variety of operators:
-
-- **Arithmetic Operators**: `+`, `-`, `*`, `/`, `%`, `**`.
-- **Comparison Operators**: `==`, `!=`, `<`, `<=`, `>`, `>=`.
-- **Logical Operators**: `and`, `or`, `!`.
-- **Assignment Operator**: `=`.
-- **Other Operators**: `.` for member access, `[]` for indexing.
-
-## Expressions
-
-Expressions represent operations that produce a value. The language supports different types of expressions:
-
-### Infix Expressions
-
-Infix expressions involve an operator between two operands. Example:
-
-```uglyface
-1 + 2  # Arithmetic expression
-a == b  # Comparison expression
-```
-
-### Prefix Expressions
-
-Prefix expressions involve an operator before the operand. Example:
-
-```uglyface
-!true  # Logical negation
--5     # Negative number
-```
-
-### Assignment Expressions
-
-Assignment expressions assign a value to a variable. Example:
-
-```uglyface
-x = 5  # Assign integer value
-message = "hello"  # Assign string value
-```
-
-## Statements
-
-Statements represent complete lines of code that perform an action. The language supports several types of statements:
-
-### Expression Statements
-
-Expression statements are single expressions that can stand alone as a complete statement. Example:
-
-```uglyface
-x + 1  # Expression statement
-print("hello")  # Function call
-```
-
-### Return Statements
-
-Return statements return a value from a function. Example:
-
-```uglyface
-f() {
-  return 10
+# Functions
+f(x, y) { 
+    return x + y 
 }
-```
 
-## Control Flow
-
-Control flow allows conditional execution and looping. The language supports if statements and while loops.
-
-### If Statements
-
-If statements execute a block of code based on a condition. Example:
-
-```uglyface
-if (x > 0) {
-  print("Positive")
-} else {
-  print("Non-positive")
-}
-```
-
-### Loops
-
-While loops execute a block of code repeatedly as long as a condition is true. Example:
-
-```uglyface
-x = 0
-while (x < 5) {
-  print(x)
-  x = x + 1
-}
-```
-
-## Functions
-
-Functions are reusable blocks of code that can be defined with parameters and executed with arguments. The language supports both regular and arrow functions.
-
-### Function Definition
-
-Functions are defined with the f keyword. Example:
-
-```uglyface
-f(x) {
-  return x * 2
-}
-```
-
-### Arrow Functions
-
-Arrow functions use the => syntax. Example:
-
-```uglyface
+# Arrow Functions
 add = f(x, y) => x + y
-```
 
-### Function Calls
-
-Functions can be called with arguments. Example:
-
-```uglyface
-add(1, 2)  # Calls the add function with arguments 1 and 2
-```
-
-## Objects and Arrays
-
-The language supports object literals and array literals.
-
-### Objects
-
-Objects are key-value pairs. Properties are accessed with the dot operator. Example:
-
-```uglyface
-person = {
-  name: "John",
-  age: 30
+# If Statements
+if (condition) { 
+    # code 
+} else { 
+    # code 
 }
 
-print(person.name)  # Access the "name" property
-```
+# While Loops
+while (condition) { 
+    # code 
+}
 
-### Arrays
-
-Arrays are indexed collections of elements. Indexing is done with square brackets. Example:
-
-```uglyface
+# Arrays
 numbers = [1, 2, 3]
 
-print(numbers[0])  # Access the first element
-```
+# Objects
+person = { 
+    name: "John", 
+    greet: f() { 
+        print("Hello, " + this.name + "!") 
+    } 
+}
 
-## Built-in Functions
+# Built-in Functions
+len([1, 2, 3])
+print("Hello, World!")
 
-The language includes built-in functions for common operations. Here are some examples:
+# Array Methods
+doubled = [1, 2, 3].map(f(x) => x * 2)
 
-- **len**: Returns the length of an array or string.
-- **first**: Returns the first element of an array.
-- **rest**: Returns the first element of an array.
-- **print**: Outputs text to the console.
-- **Array.map**: Maps over the array and apply transformation on it.
-- **Array.filter**: filter an array given a filter function
+# Break Statements
+while (true) {
+    if (condition) {
+        break
+    }
+}
 
-Examples:
-
-```uglyface
-len([1, 2, 3]) 								# result = 3
-
-first([1, 2, 3]) 								# result = 1
-
-rest([1, 2, 3]) 								# result = [2, 3]
-
-[1, 2, 3].map(f(x) => x ** 2) 			# result = [1, 4, 9]
-
-[1, 2, 3].filter(f(x) => x % 2 == 1) 	# result = [1, 9]
+# String Methods
+text = "Hello, World!"
+words = text.split(", ")
+stripped = text.strip()
 ```
 
 ## Architecture
 
-The project is structured into different stages to parse and evaluate custom language code.
+The project is structured into different components:
 
-### Parsing Stage
+1. **Lexer**: Tokenizes the source code into individual tokens.
+2. **Parser**: Converts tokens into an Abstract Syntax Tree (AST).
+3. **AST Nodes**: Defines various node types like Expression, Statement, Identifier, etc.
+4. **Evaluator**: Executes the AST, applying operations and built-in functions.
+5. **Environment**: Manages variable bindings and scope.
+6. **Objects**: Represents different types of values in the language (e.g., Integer, String, Array).
 
-The parsing stage is responsible for converting the source code into an Abstract Syntax Tree (AST). It involves the following components:
+## Tutorial
 
-- **Lexer**: Tokenizes the source code into individual tokens.
-- **Parser**: Converts tokens into an AST.
-- **AST Nodes**: Defines various node types like Expression, Statement, Identifier, InfixExpression, etc.
-- **Precedence**: Defines operator precedence to ensure correct parsing of complex expressions.
+Let's create a simple program to demonstrate some features of the custom language:
 
-### Evaluation Stage
-
-The evaluation stage executes the AST to produce results. It involves the following components:
-
-- **Environment**: Manages variable bindings and scope, supporting nested scopes.
-- **Evaluator**: Evaluates the AST, applying operations and built-in functions.
-- **Objects**: Represents various object types like IntegerObj, StringObj, BooleanObj, etc.
-- **Built-in Functions**: Provides built-in operations like len, first, last, print, etc.
-- **Error Handling**: Manages errors during evaluation, providing detailed error messages when operations fail or invalid types are used.
-
-## Using the Language
-
-This section demonstrates how to use the custom language, highlighting key features through an example code snippet.
-
-Example: Creating a Binary Search Tree
-Here's a sample script that creates a binary search tree from an array and demonstrates recursion, functions, array manipulations, and object operations:
-
-```uglyface
-make_tree = f(arr) {
-	create_tree = f(arr) {
-		if(len(arr) == 0) return null;
-		mid = len(arr) / 2;
-
-		return {
-			value: arr[mid],
-			left: create_tree(arr.slice(0, mid)),
-			right: create_tree(arr.slice(mid + 1)),
-		};
-	};
-
-	inorder = f(root) {
-		if(root == null) return;
-
-		inorder(root.left);
-		print(root.value);
-		inorder(root.right);
-	};
-
-	sum_tree = f(root) {
-		if(root == null) return 0;
-
-		left_sum = sum_tree(root.left);
-		right_sum = sum_tree(root.right);
-		return left_sum + right_sum + root.value;
-	};
-
-	tree = create_tree(arr, 0, len(arr) - 1);
-
-	return {
-		view: 		f() => print(tree),
-		inorder: 	f() => inorder(tree),
-		sum: 			f() => sum_tree(tree),
-		getRoot: 	f() => tree
-	};
+```plaintext
+# Define a function to calculate factorial
+factorial = f(n) {
+    if (n == 0) {
+        return 1;
+    } else {
+        return n * factorial(n - 1);
+    }
 };
 
-tree = make_tree([1,2,3,4,5,6,7])
-tree.inorder();
-tree.view();
+# Create an array of numbers
+numbers = [5, 3, 7, 2, 8];
+
+# Use built-in functions and a loop to calculate factorials
+print("Factorials:");
+i = 0;
+while (i < len(numbers)) {
+    num = numbers[i];
+    result = factorial(num);
+    print(num + "! = " + result);
+    i = i + 1;
+}
+
+# Define an object with methods
+math_helper = {
+    square: f(x) { return x * x; },
+    cube: f(x) { return x * x * x; }
+};
+
+# Use object methods and array methods
+print("Squares and Cubes:");
+numbers.map(f(num) {
+    print(num + ": square = " + math_helper.square(num) + ", cube = " + math_helper.cube(num));
+});
+
+# Demonstrate array filter method
+even_numbers = numbers.filter(f(num) { return num % 2 == 0; });
+print("Even numbers: " + even_numbers);
+
+# String manipulation
+message = "Hello, World!";
+words = message.split(", ");
+print("Words: " + words);
 ```
 
-This script showcases the creation of a binary search tree function object with encapsulated data, traversing it in-order, viewing the tree structure, and demonstrating a while loop.
+This program demonstrates:
+1. Function definition and recursion (factorial function)
+2. Array usage and array methods (map, filter)
+3. While loops
+4. Built-in functions (len, print)
+5. Object definition with methods
+6. Higher-order functions
+7. String manipulation
 
-MIT License
+## Contributing
 
-Copyright (c) [2024] [MaxwellKnight]
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Contributions are welcome! Please feel free to submit a Pull Request.

@@ -66,7 +66,7 @@ export class StringObj extends Obj {
 		this.value = value;
 		this.properties.set('split', StringObj.split);
 		this.properties.set('strip', StringObj.strip);
-		this.properties.set('try_parse', StringObj.try_parse);
+		this.properties.set('into_int', StringObj.into_int);
 		this.properties.set('is_numeric', StringObj.is_numeric);
 	}
 
@@ -94,7 +94,7 @@ export class StringObj extends Obj {
 		return new ArrayObj(values);
 	}
 
-	static try_parse(self: Obj, ...args: Obj[]): Obj {
+	static into_int(self: Obj, ...args: Obj[]): Obj {
 		if (!(self instanceof StringObj)) {
 			return ErrorObj.create("first argument to `try_parse` must be of type `string`, got: ", [self.type]);
 		}
