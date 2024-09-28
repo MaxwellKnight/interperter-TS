@@ -58,5 +58,5 @@ parse_atomic = f(tokens) {
 }
 
 
-eval = f(expr) => parse_additive(expr.strip().split(""))
+eval = f(expr) => parse_additive(expr.strip().split(""));
 print("Result:", eval("(3 + 2) * (5 - 1)"));

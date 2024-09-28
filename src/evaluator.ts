@@ -1,4 +1,4 @@
-import { Environment, builtin_first, builtin_last, builtin_len, builtin_print, builtin_rest } from "./environment";
+import { Environment, builtin_first, builtin_last, builtin_len, builtin_print, builtin_rest, builtin_yo_mama } from "./environment";
 import { ArrayLiteral, ArrowFunctionLiteral, AssignExpression, BlockStatement, BooleanExpression, BreakStatement, CallExpression, Expression, ExpressionStatement, FunctionLiteral, Identifier, IfExpression, IndexExpression, InfixExpression, IntegerLiteral, MemberExpression, Node, ObjectLiteral, PrefixExpression, Program, ReturnStatement, Statement, StringLiteral, WhileStatement } from "./interfaces/nodes";
 import { ArrayObj, BooleanObj, BreakObj, BuiltinObj, ErrorObj, FALSE, FunctionObj, IntegerObj, NULL, NullObj, Obj, ObjectObj, ObjectType, ReturnObj, StringObj, TRUE } from "./interfaces/object";
 
@@ -14,6 +14,7 @@ export class Evaluator {
 		this.builtins.set("last", new BuiltinObj(builtin_last, "last"));
 		this.builtins.set("rest", new BuiltinObj(builtin_rest, "rest"));
 		this.builtins.set("print", new BuiltinObj(builtin_print, "print"));
+		this.builtins.set("yo_mama", new BuiltinObj(builtin_yo_mama, "yo_mama"));
 		this.builtins.set("null", new NullObj());
 	};
 
