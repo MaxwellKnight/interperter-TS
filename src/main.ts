@@ -7,7 +7,7 @@ import { dot_to_pdf, create_env_dot } from './graphviz';
 
 const prompt = promptSync();
 class REPL {
-  #env: Environment;
+	#env: Environment;
 
 	constructor() {
 		this.#env = new Environment();
@@ -16,7 +16,7 @@ class REPL {
 	public run(): void {
 		while (true) {
 			const source = prompt('>> ');
-			if(source && (source.trim() === 'exit' || source.trim() === 'quit')){
+			if (source && (source.trim() === 'exit' || source.trim() === 'quit')) {
 				console.log("Exiting REPL."); return;
 			}
 			this.process(source || "", true);
@@ -43,7 +43,7 @@ class REPL {
 			if (should_continue) return;
 		} else {
 			const result = evaluator.eval(program, this.#env);
-			if(should_continue) console.log(result.stringify ? result.stringify() : result);
+			if (should_continue) console.log(result.stringify ? result.stringify() : result);
 		}
 	}
 
@@ -62,7 +62,7 @@ class REPL {
 
 		if (fs.existsSync(fileName)) {
 			repl.runFromFile(fileName);
-			if(args[1] && args[1] === '-d') dot_to_pdf(create_env_dot(envs), "dot.pdf")
+			if (args[1] && args[1] === '-d') dot_to_pdf(create_env_dot(envs), "dot.pdf")
 			return;
 		}
 		console.error(`File not found: ${fileName}\n`);
