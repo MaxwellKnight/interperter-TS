@@ -18,9 +18,8 @@ export type ObjectValue = number | string | boolean | Obj
 export type BuiltinFunction = (...args: Obj[]) => Obj
 export type MemberFunction = (self: Obj, ...args: Obj[]) => Obj;
 
-// Base class for all objects in the interpreter
 export abstract class Obj {
-	type: ObjectType; // Type of the object
+	type: ObjectType;
 	value!: ObjectValue;
 	properties: Map<ObjectValue, Obj | MemberFunction>;
 
@@ -29,7 +28,6 @@ export abstract class Obj {
 		this.type = type;
 	}
 
-	//return a string representation of the object
 	public abstract stringify(): string;
 }
 
